@@ -1,0 +1,40 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Dependency directories
+jspm_packages/
+
+# Test coverage
+coverage/
+
+# Build output
+dist/
+build/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# dotenv environment files
+.env
+.env.local
+.env.*.local
+
+# npm package lock
+package-lock.json
+
+# Yarn lock file
+yarn.lock
+
+# IDE/Editor folders
+.idea/
+.vscode/
+
+# Operating system files
+*.swp
+*.swo
