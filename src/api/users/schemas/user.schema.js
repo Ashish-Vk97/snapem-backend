@@ -6,7 +6,7 @@ const userSchema = new Schema({
     email: {type:String, required: true},
     password: {type:String, required: true},    
     gender:{type:String, enum: ['M', 'F', 'O'], default: 'M'},
-    role: {type:String, enum: ['admin', 'user'], default: 'user'},
+    role: {type:String, enum: ['ADMIN', 'USER'], default: 'USER'},
     phone: {type:String, required: true},
     status: {   type: String,   enum: ['active', 'inactive'],   default: 'active' },
     isActive: {type: Boolean, default: true},

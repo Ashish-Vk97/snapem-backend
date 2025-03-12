@@ -58,26 +58,26 @@ module.exports = {
             return response.internalFailureResponse(res, error.message);
         }  
     },
-    changePassword:async (req, res) => {
-        try {
-            const data = req.body;
+    // changePassword:async (req, res) => {
+    //     try {
+    //         const data = req.body;
 
-            const failure = userValidation.changePassword.validate(data);
-            if (failure.error) {
-                return response.failedValidationResponse(res, failure, null);
-            }        
+    //         const failure = userValidation.changePassword.validate(data);
+    //         if (failure.error) {
+    //             return response.failedValidationResponse(res, failure, null);
+    //         }        
 
-            const result = await service.changePassword(req);
+    //         const result = await service.changePassword(req);
 
-            if( result && typeof result !== 'string'){
+    //         if( result && typeof result !== 'string'){
 
-                return response.successResponse(res, result, 'Password changed successfully');   
-            }       
-             return response.servicefailureResponse(res, result);
+    //             return response.successResponse(res, result, 'Password changed successfully');   
+    //         }       
+    //          return response.servicefailureResponse(res, result);
 
-        } catch (error) {
-            console.log(error.message, 'error');
-            return response.internalFailureResponse(res, error.message);
-        }  
-    }
+    //     } catch (error) {
+    //         console.log(error.message, 'error');
+    //         return response.internalFailureResponse(res, error.message);
+    //     }  
+    // }
  };
