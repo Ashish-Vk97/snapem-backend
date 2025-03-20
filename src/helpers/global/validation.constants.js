@@ -9,7 +9,7 @@ module.exports = {
     date:joi.date().required(),
     number:joi.number().required(),
     // role:joi.string().valid('admin','user').required(),
-    role:joi.string().valid('admin','user').required(),
+    role:joi.string().valid('ADMIN','USER').required(),
     email:joi.string().email().required().min(5).max(100),
     password:joi.string().required().min(5).max(100),
     phone:joi.string().required().min(10).max(10),

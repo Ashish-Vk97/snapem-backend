@@ -56,13 +56,15 @@ module.exports = {
         return response.failedValidationResponse(res, failure, null);
       }
 
-      const result = await service.forgotPassword(data);
+      const result = await service.forgotPassword(data?.email);
       if (result && typeof result !== "string") {
-        return response.successResponse(res, result);
+        return response.successResponse(res, result,"Password reset link has been sent to your mail!" );
       }
       return response.servicefailureResponse(res, result);
     } catch (error) {
       return response.internalFailureResponse(res, error.message);
     }
   },
+  
+  
 };

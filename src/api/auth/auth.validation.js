@@ -17,7 +17,7 @@ module.exports = {
     }),
     forgotPassword: joi.object().keys({
         email:validations.email,
-        password:validations.password
+        
         
     })
 };

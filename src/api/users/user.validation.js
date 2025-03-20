@@ -23,7 +23,7 @@ module.exports = {
         changePassword: joi.object().keys({
             
             password:validations.password,
-            confirm_password:validations.password,
+            // confirm_password:validations.password,
            
         }),
 };

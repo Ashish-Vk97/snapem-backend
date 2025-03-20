@@ -58,26 +58,36 @@ module.exports = {
             return response.internalFailureResponse(res, error.message);
         }  
     },
-    // changePassword:async (req, res) => {
-    //     try {
-    //         const data = req.body;
-
-    //         const failure = userValidation.changePassword.validate(data);
-    //         if (failure.error) {
-    //             return response.failedValidationResponse(res, failure, null);
-    //         }        
-
-    //         const result = await service.changePassword(req);
-
-    //         if( result && typeof result !== 'string'){
-
-    //             return response.successResponse(res, result, 'Password changed successfully');   
-    //         }       
-    //          return response.servicefailureResponse(res, result);
-
-    //     } catch (error) {
-    //         console.log(error.message, 'error');
-    //         return response.internalFailureResponse(res, error.message);
-    //     }  
-    // }
+     changePassword : async(req, res) =>{
+        try {
+          const data = req.body;
+          // console.log(`${TAG}.changePassword: `, data);
+      
+          const failure = userValidation.changePassword.validate(data);
+          if (failure.error) {
+            return response.failedValidationResponse(res, failure);
+          }
+      
+          const result = await service.changePassword(req?.user?.id, data.password);
+      
+          if (result === data.password) {
+            return response.servicefailureResponse(
+              res,
+              "You've entered an old password! Please try again."
+            );
+          }
+      
+          if (result) {
+          
+      
+            return response.successResponse(res, result, "New password updated successfully");
+          }
+      
+          return response.servicefailureResponse(res);
+        } catch (error) {
+          console.log(error);
+        //   logger.error(`Change password failed: ${error.message}`);
+          return response.internalFailureResponse(res, error);
+        }
+      }
  };

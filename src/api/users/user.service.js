@@ -1,4 +1,6 @@
+const { comparePassword, hashPassword } = require("../../helpers/utils/auth.utils");
 const User = require("./schemas/user.schema");
+const mongoose = require("mongoose");
 module.exports = {
   createUser: async (req, res) => {
     try {
@@ -75,4 +77,30 @@ module.exports = {
       res.status(500).json({ message: error.message });
     }
   },
+
+   changePassword : async(userId, password) => {
+    try {
+      if (!mongoose.isValidObjectId(userId)) return "Invalid user id!";
+  
+      const users = await User.findById(userId);
+      if (users) {
+        
+          const verified = await comparePassword(password, users.password);
+          if (verified) return password;
+        
+        return await User.findByIdAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            password: await hashPassword(password),
+          },
+          { new: true }
+        );
+      }
+    } catch (error) {
+      // logger.error(`Change password service failed: ${error.message}`);
+      console.log(error.message);
+    }
+  }
 };
