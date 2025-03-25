@@ -40,7 +40,7 @@ app.use(cors());
 app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Hello Snapem server running!');
 });
 
 const environment = process.env.NODE_ENV || 'development';
