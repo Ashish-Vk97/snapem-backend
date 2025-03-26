@@ -10,6 +10,7 @@ logs/
 jspm_packages/
 
 # Uploads folder
+./src/uploads/
 
 # Test coverage
 coverage/
