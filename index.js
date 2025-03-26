@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGODB_URI)
 })
 .catch(err => console.log(err));
 
-console.log(path.join(__dirname,"src", 'uploads'), '=index====dirname');
+// console.log(path.join(__dirname,"src", 'uploads'), '=index====dirname');
 
 app.use('/api/screenshot/images/all/', express.static(path.join(__dirname, "src")));
 
