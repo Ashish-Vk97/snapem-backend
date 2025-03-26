@@ -4,9 +4,11 @@ const fs = require('fs');
 
 
 const localUploadDir = './src/uploads/';
-console.log(!fs.existsSync(localUploadDir), 'localUploadDir');
-if (!fs.existsSync(localUploadDir)) {
-  fs.mkdirSync(localUploadDir);
+if (process.env.NODE_ENV !== 'production') {
+    console.log(!fs.existsSync(localUploadDir), 'localUploadDir');
+    if (!fs.existsSync(localUploadDir)) {
+        fs.mkdirSync(localUploadDir, { recursive: true });
+    }
 }
 
 const storage = multer.diskStorage({
