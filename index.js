@@ -33,7 +33,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // console.log(path.join(__dirname,"src", 'uploads'), '=index====dirname');
 
-const staticFilePath = process.env.NODE_ENV === 'production' ? '/tmp' : path.join(__dirname, "src");
+const staticFilePath = process.env.NODE_ENV === 'production' ? path.join(__dirname, "tmp") : path.join(__dirname, "src");
 app.use('/api/screenshot/images/all/', express.static(staticFilePath));
 
 app.use(express.json()); 

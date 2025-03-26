@@ -18,7 +18,9 @@ module.exports ={
     },
     getAllScreenshots: async (req, res) => {
         try {
-            const uploadDir = path.join(__dirname, '..',"..", 'uploads');
+            const uploadDir = process.env.NODE_ENV === 'production' 
+                ? '/tmp/' 
+                : path.join(__dirname, '..', '..', 'uploads');
 
         //   console.log( path.join(__dirname, '..',"..", 'uploads'), '==========>');
           
