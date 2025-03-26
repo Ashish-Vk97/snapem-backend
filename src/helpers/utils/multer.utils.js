@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
     //   cb(null, './src/uploads/');
-    const uploadDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : localUploadDir; // Local environment: ./uploads, hosted: /tmp/uploads
+    const uploadDir = process.env.NODE_ENV === 'production' ? '/tmp' : localUploadDir; // Local environment: ./uploads, hosted: /tmp/uploads
     cb(null, uploadDir);
        // Save the files to the 'uploads' folder
     },
