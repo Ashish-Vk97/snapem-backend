@@ -9,6 +9,8 @@ logs/
 # Dependency directories
 jspm_packages/
 
+# Uploads folder
+src/uploads/
 # Test coverage
 coverage/
 

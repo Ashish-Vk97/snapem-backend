@@ -14,7 +14,7 @@ module.exports = {
         return generateResponse(res, false, message||"failure", 404, data); 
     },
     authFailureResponse: (res, message, data=null) => {
-        return generateResponse(res, false, message||"authentication failure", 401, data); 
+        return generateResponse(res, false, message||"authentication failure", 403, data); 
     },
     internalFailureResponse:(res, message, data=null) => {
         return generateResponse(res, false, message||"Internal server error", 500, data); 

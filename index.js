@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); 
 const mongoose = require('mongoose');
 const User = require('./src/api/users/schemas/user.schema');
 const apiRouter = require('./src/api/api.router');
@@ -30,6 +31,9 @@ mongoose.connect(process.env.MONGODB_URI)
 })
 .catch(err => console.log(err));
 
+console.log(path.join(__dirname,"src", 'uploads'), '=index====dirname');
+
+app.use('/api/screenshot/images/all/', express.static(path.join(__dirname, "src")));
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));

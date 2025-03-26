@@ -12,8 +12,9 @@ module.exports = {
     const { email, password } = data;
     try {
       const user = await User.findOne({ email });
+      
       if (!user) {
-        return "User not found";
+        return "Email or password is incorrect. Please try again.";
       }
       if (!user.isActive) {
         return "User is not active";
@@ -26,7 +27,7 @@ module.exports = {
       const verified = await comparePassword(password, user.password);
 
       if (!verified) {
-        return "You have entered a wrong password! Please try again";
+        return "Email or password is incorrect! Please try again";
       }
       return {
         token: await generateToken({
