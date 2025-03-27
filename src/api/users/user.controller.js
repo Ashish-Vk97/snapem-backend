@@ -78,9 +78,7 @@ module.exports = {
           }
       
           if (result) {
-          
-      
-            return response.successResponse(res, result, "New password updated successfully");
+              return response.successResponse(res, result, "New password updated successfully");
           }
       
           return response.servicefailureResponse(res);

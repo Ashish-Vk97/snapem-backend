@@ -28,7 +28,7 @@ module.exports ={
           const files = await fs.readdir(uploadDir);
       
           // Generate full file paths
-          const filePaths = files.map(file => `/uploads/${file}`);
+          const filePaths = files.map(file => `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file}`);
         
           // Send the list of file paths back as a JSON response
           if (!filePaths.length >0) {
