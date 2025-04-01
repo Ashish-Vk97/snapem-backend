@@ -7,6 +7,7 @@ const User = require('./src/api/users/schemas/user.schema');
 const apiRouter = require('./src/api/api.router');
 const { role } = require('./src/helpers/global/validation.constants');
 const { hashPassword } = require('./src/helpers/utils/auth.utils');
+const ngrok = require('ngrok');
 // const main = require('./src/utils/mail.utils');
 const app = express();
 const port = process.env.PORT || 3000;
@@ -50,6 +51,9 @@ app.get('/', (req, res) => {
 
 const environment = process.env.NODE_ENV || 'development';
 
-app.listen(port, () => {
+ngrok.connect({ addr: 3000, authtoken_from_env: true })
+	.then(listener => console.log(`Ingress established at: ${listener}`));
+
+app.listen(port, () => {  
     console.log(`Server is running in ${environment} mode on http://localhost:${port}`);
 });   
