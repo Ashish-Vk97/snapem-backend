@@ -9,6 +9,9 @@ const userSchema = new Schema({
     role: {type:String, enum: ['ADMIN', 'USER'], default: 'USER'},
     phone: {type:String, required: true},
     status: {   type: String,   enum: ['active', 'inactive'],   default: 'active' },
+    profileImage: {type:String, default: null},
+    emergencyContacts: [{type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"}],
+    emergencyContactId: {type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"},
     isActive: {type: Boolean, default: true},
     isDelete: {type: Boolean, default: false},
     

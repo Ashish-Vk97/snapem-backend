@@ -7,5 +7,6 @@ router.use('/test', (req, res) => {
 router.use('/auth', require('./auth/auth.router'));
 router.use('/users', require('./users/user.router'));
 router.use('/screenshot', require('./screenshots/screenshot.router'));
+router.use('/emergency', require('./emergency/emergency_contact.router'));
 
 module.exports = router;
