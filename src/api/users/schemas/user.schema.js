@@ -10,6 +10,14 @@ const userSchema = new Schema({
     phone: {type:String, required: true},
     status: {   type: String,   enum: ['active', 'inactive'],   default: 'active' },
     profileImage: {type:String, default: null},
+    address: {
+        country: {type: String, required: true},
+       state: {type: String, required: true},
+        pincode: {type: String, required: true},
+        city: {type: String, required: true}
+    },
+    screenshotsList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Screenshot' }],
+  
     emergencyContacts: [{type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"}],
     emergencyContactId: {type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"},
     isActive: {type: Boolean, default: true},

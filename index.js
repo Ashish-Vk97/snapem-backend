@@ -25,7 +25,13 @@ mongoose.connect(process.env.MONGODB_URI)
                 email: 'john@email.com',
                 password: await hashPassword('123456'),
                 phone:"+1234567890",  
-                role:"ADMIN" 
+                role:"ADMIN" ,
+                address:{
+                    country: "India",
+                    state: "Maharashtra",
+                    pincode: "400001",
+                    city: "Mumbai"
+                }
             }
         );
     }

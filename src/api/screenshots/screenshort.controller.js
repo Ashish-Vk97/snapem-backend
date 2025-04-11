@@ -1,44 +1,66 @@
 const response = require('../../helpers/utils/api-response/response.function');
 const path = require('path');
+const Screenshot = require('./schemas/screenshot.schema');
+const User = require('../users/schemas/user.schema');
+const { saveScreenshot, getAllScreenshots } = require('./screenshort.service');
 const fs = require('fs').promises;
 
 module.exports ={
     saveScreenshot: async (req, res) => {
         try {
-            const file = req.files;
-            // console.log(file,"file====>")
-            if (!file.length > 0) {
+          const userId = req.user.id;
+            const files = req.files;
+            console.log(files,"file====>")
+            if (!files.length > 0) {
                 return response.servicefailureResponse(res, "No files uploaded");
-                
             }
-           return  response.successResponse(res, null, 'file uploaded successfully'); 
+          
+         const result = await saveScreenshot(req); 
+         console.log(result, 'result');
+          
+      if( result && typeof result !== 'string'){
+
+          return response.successResponse(res, result, 'screenshot files uploaded successfully');   
+      }
+       return response.servicefailureResponse(res, result);
+ 
         } catch (error) {
+          console.log(error)
             return response.internalFailureResponse(res, error.message);
         }
     },
     getAllScreenshots: async (req, res) => {
         try {
-            const uploadDir = process.env.NODE_ENV === 'production' 
-                ? '/tmp/' 
-                : path.join(__dirname, '..', '..', 'uploads');
+        //     const uploadDir = process.env.NODE_ENV === 'production' 
+        //         ? '/tmp/' 
+        //         : path.join(__dirname, '..', '..', 'uploads');
 
-        //   console.log( path.join(__dirname, '..',"..", 'uploads'), '==========>');
+        // //   console.log( path.join(__dirname, '..',"..", 'uploads'), '==========>');
           
    
-          const files = await fs.readdir(uploadDir);
+        //   const files = await fs.readdir(uploadDir);
       
-          // Generate full file paths
-          const filePaths = files.map(file => `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file}`);
+        //   // Generate full file paths
+        //   const filePaths = files.map(file => `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file}`);
         
-          // Send the list of file paths back as a JSON response
-          if (!filePaths.length >0) {
-            return response.servicefailureResponse(res, "No files uploaded");
+        //   // Send the list of file paths back as a JSON response
+        //   if (!filePaths.length >0) {
+        //     return response.servicefailureResponse(res, "No files uploaded");
+        //   }
+        //   const results ={
+        //         message: 'All screenshots fetched successfully',
+        //         images: filePaths
+        //   }
+          const result = await getAllScreenshots(req);
+          
+          if( result && typeof result !== 'string'){
+    
+              return response.successResponse(res, result, 'screenshot files fetched successfully');   
           }
-          const result ={
-                message: 'All screenshots fetched successfully',
-                images: filePaths
-          }
-         return  response.successResponse(res, result, 'file uploaded successfully'); 
+           return response.servicefailureResponse(res, result);
+              
+         
+          
         
         } catch (error) {
           // Handle errors

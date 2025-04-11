@@ -8,6 +8,7 @@ module.exports = {
             password:validations.password,
             phone:validations.phone,
             gender:validations.gender,
+            address:validations.object,
             role:validations.role.optional()
         
     }),
