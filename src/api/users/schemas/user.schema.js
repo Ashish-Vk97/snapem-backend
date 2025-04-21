@@ -17,7 +17,7 @@ const userSchema = new Schema({
         city: {type: String, required: true}
     },
     screenshotsList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Screenshot' }],
-  
+    videosList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
     emergencyContacts: [{type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"}],
     emergencyContactId: {type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"},
     isActive: {type: Boolean, default: true},

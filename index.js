@@ -8,10 +8,24 @@ const apiRouter = require('./src/api/api.router');
 const ngrok = require("@ngrok/ngrok");
 const { role } = require('./src/helpers/global/validation.constants');
 const { hashPassword } = require('./src/helpers/utils/auth.utils');
+const helmet = require('helmet');
 // const ngrok = require('ngrok');
 // const main = require('./src/utils/mail.utils');
 const app = express();
 const port = process.env.PORT || 3000;
+
+
+app.use(
+    helmet({
+      frameguard: false, // This disables X-Frame-Options
+    })
+  );
+  
+  // OR: allow iframes from your origin
+  app.use((req, res, next) => {
+    res.setHeader('X-Frame-Options', 'ALLOWALL'); 
+    next();
+  });
 
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -42,7 +56,11 @@ mongoose.connect(process.env.MONGODB_URI)
 // console.log(path.join(__dirname,"src", 'uploads'), '=index====dirname');
 
 const staticFilePath = process.env.NODE_ENV === 'production' ? path.join(__dirname, "tmp") : path.join(__dirname, "src");
+const staticVideoFilePath = process.env.NODE_ENV === 'production' ? path.join(__dirname, "tmp") : path.join(__dirname, "src");
 app.use('/api/screenshot/images/all/', express.static(staticFilePath));
+app.use('/api/video/sos/all/', express.static(staticVideoFilePath));
+
+
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
