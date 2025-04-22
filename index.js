@@ -57,6 +57,8 @@ mongoose.connect(process.env.MONGODB_URI)
 
 const staticFilePath = process.env.NODE_ENV === 'production' ? path.join(__dirname, "tmp") : path.join(__dirname, "src");
 const staticVideoFilePath = process.env.NODE_ENV === 'production' ? path.join(__dirname, "tmp") : path.join(__dirname, "src");
+
+console.log(staticFilePath, 'staticFilePath====>');
 app.use('/api/screenshot/images/all/', express.static(staticFilePath));
 app.use('/api/video/sos/all/', express.static(staticVideoFilePath));
 
@@ -71,7 +73,7 @@ app.use(cors());
 app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
-    res.send('Hello Snapem server running!');
+    res.send('Hello Snapem server running!' + staticFilePath);
 });
 
 const environment = process.env.NODE_ENV || 'development';
