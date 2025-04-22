@@ -33,7 +33,9 @@ module.exports = {
       }
 
       files.forEach((file) => {
-        const imageLink = `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file.filename}`;
+        const imageLink = process.env.NODE_ENV === 'production' 
+          ? `${process.env.SERVER_URL}/api/screenshot/images/all/tmp/${file.filename}` 
+          : `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file.filename}`;
         screenshotEntry.screenshots.push({
           imageName: file.originalname,
           imageLink: imageLink,
