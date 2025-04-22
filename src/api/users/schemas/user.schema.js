@@ -16,10 +16,15 @@ const userSchema = new Schema({
         pincode: {type: String, required: true},
         city: {type: String, required: true}
     },
+     subsciptionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SubscriptionPlan',
+      },
     screenshotsList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Screenshot' }],
     videosList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
     emergencyContacts: [{type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"}],
     emergencyContactId: {type: mongoose.Schema.Types.ObjectId, ref: "Emergencycontact"},
+    isSubscribed: {type: Boolean, default: false},  
     isActive: {type: Boolean, default: true},
     isDelete: {type: Boolean, default: false},
     

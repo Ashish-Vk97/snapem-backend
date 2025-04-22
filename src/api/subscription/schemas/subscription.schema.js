@@ -1,16 +1,33 @@
 const mongoose = require('mongoose');
 
 const SubscriptionCardSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   cardType: {
     type: String,
     required: true,
-    enum: ['Basic', 'Standard', 'Premium', 'Custom'], // You can modify as needed
+    enum: ['Monthly', 'Quarterly', 'Yearly'], // You can modify as needed
   },
   price: {
     type: Number,
     required: true,
     min: 0,
   },
+  stripeProductId: {
+    type: String,
+    
+  },
+  stripePriceId: {
+    type: String,
+   
+  },
+  stripePlanId: {
+    type: String,
+    
+  },
+  
   duration: {
     type: Number, // In days
     required: true,
@@ -52,6 +69,7 @@ const SubscriptionCardSchema = new mongoose.Schema({
   timestamps: true // Automatically adds createdAt and updatedAt
 });
 
-const SubscriptionCard = mongoose.model('SubscriptionCard', SubscriptionCardSchema);
+const SubscriptionPlan = mongoose.models.SubscriptionPlan || mongoose.model('SubscriptionPlan', SubscriptionCardSchema);
 
-module.exports = SubscriptionCard;
+module.exports.SubscriptionCardSchema = SubscriptionCardSchema; 
+module.exports = SubscriptionPlan;
