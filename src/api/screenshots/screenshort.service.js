@@ -46,28 +46,36 @@ module.exports = {
 
       await screenshotEntry.save();
 
-
       const user = await User.findById(userId);
       if (!user.screenshots) user.screenshots = [];
 
       if (!user.screenshotsList.includes(screenshotEntry._id)) {
         user.screenshotsList.push(screenshotEntry._id);
         await user.save();
-
-       
       }
       console.log(screenshotEntry, "screenshotEntry service=====>");
       return screenshotEntry;
     } catch (error) {
-        console.error("Error saving screenshot:", error);
-        return error.message;
+      console.error("Error saving screenshot:", error);
+      return error.message;
     }
   },
   getAllScreenshots: async (req) => {
     try {
       const userId = req.user.id;
-      const screenshots = await Screenshot.find({ user: userId });
-      if (!screenshots) {
+      const { startDate, endDate } = req.query;
+
+      const query = { user: userId };
+      if (startDate || endDate) {
+        query.date = {};      
+        if (startDate) query.date.$gte = new Date(startDate);
+        if (endDate) query.date.$lte = new Date(endDate);
+      }
+
+      console.log(query, "query=====>");
+
+      const screenshots = await Screenshot.find(query);
+      if (!screenshots || screenshots.length === 0) {
         return "No screenshots found for this user.";
       }
       return screenshots;
@@ -75,5 +83,5 @@ module.exports = {
       console.error("Error fetching screenshots:", error);
       return error.message;
     }
-  }
+  },
 };

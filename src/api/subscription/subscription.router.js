@@ -1,12 +1,14 @@
 const router = require('express').Router();
 
 const authenticateToken = require('../../helpers/middlewares/authenticateToken');
-const { createSubscriptionPlan, getAllUsers, getUserById, updateUser,changePassword } = require('./subscription.controller');
+const { createSubscriptionPlan,updateSubscriptionPlanById,getSubscriptionById, getAllSubscriptionPlans,deleteSubscriptionPlanById } = require('./subscription.controller');
+
 
 router.post('/create', createSubscriptionPlan);
-// router.get('/all',authenticateToken, getAllUsers);
-// router.get('/:id', getUserById);
-// router.put('/update/:id', updateUser);
+router.get('/all', getAllSubscriptionPlans);
+router.get('/:id', getSubscriptionById);
+router.put('/update/:id', updateSubscriptionPlanById);
+router.delete('/delete/:id', deleteSubscriptionPlanById);
 
 
 module.exports = router;

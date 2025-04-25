@@ -17,20 +17,21 @@ const SubscriptionCardSchema = new mongoose.Schema({
   },
   stripeProductId: {
     type: String,
-    
+    default: "",
   },
   stripePriceId: {
     type: String,
+    default: "",
    
   },
   stripePlanId: {
     type: String,
-    
+    default: "",
   },
   
   duration: {
     type: Number, // In days
-    required: true,
+    
   },
   currency: {
     type: String,
