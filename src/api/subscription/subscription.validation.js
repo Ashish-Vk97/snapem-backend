@@ -3,7 +3,7 @@ const validations = require('../../helpers/global/validation.constants');
 
 module.exports = {
     createSubscriptionPlan: Joi.object().keys({
-        cardType: Joi.string().valid('Monthly', 'Quarterly', 'Yearly').required(),
+        cardType: Joi.string().valid('monthly', 'quarterly', 'yearly').required(),
         price: Joi.number().min(0).required(),
         duration: Joi.number().integer().min(1).required(),
         currency: Joi.string().default('usd'),
