@@ -1,12 +1,49 @@
 const SubscriptionPlan = require("./schemas/subscription.schema");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 module.exports ={
     createSubscriptionPlan: async (req ) => {
         const data = req.body;
         try {
-            
+
+          const product = await stripe.products.create({
+            name: data?.cardType,
+            description: data?.description || '',
+          });
+      
+          // 2. Create Stripe Price (Recurring)
+          const priceInCents = Math.round(data?.price * 100);
+          let interval, interval_count;
+
+          switch (data?.duration) {
+            case 1: // Monthly
+              interval = 'month';
+              interval_count = 1;
+              break;
+            case 2: // Quarterly (every 6 months)
+              interval = 'month';
+              interval_count = 6;
+              break;
+            case 3: // Yearly
+              interval = 'year';
+              interval_count = 1;
+              break;
+            default:
+              throw new Error("Invalid duration value");
+          }
+          
+          const stripePrice = await stripe.prices.create({
+            unit_amount: priceInCents,
+            currency: data?.currency?.toLowerCase() || 'usd',
+            recurring: {
+              interval,
+              interval_count,
+            },
+            product: product.id,
+          });
+            console.log(product, stripePrice,"product====================>");
         //    const subscriptionPlan = await SubscriptionPlan.create(data)
-           const newPlan = new SubscriptionPlan(data);
+           const newPlan = new SubscriptionPlan({...data, stripeProductId: product.id, stripePriceId: stripePrice.id});
            const subscriptionDetails = await newPlan.save();
             
             if (!subscriptionDetails) {
@@ -30,7 +67,7 @@ module.exports ={
       const subscriptionPlans = await SubscriptionPlan.find()
         .limit(limit)
         .skip(startIndex)
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: 1 });
 
       if (subscriptionPlans.length > 0) {
         return subscriptionPlans;

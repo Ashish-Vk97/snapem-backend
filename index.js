@@ -27,6 +27,11 @@ app.use(
     next();
   });
 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(cors()); 
+
 
 mongoose.connect(process.env.MONGODB_URI)
 .then(async() =>{
@@ -64,13 +69,15 @@ app.use('/api/video/sos/all/', express.static(staticVideoFilePath));
 
 
 
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
-app.use(cors()); 
 
  
 app.use('/api', apiRouter);
+app.get("/success", (req, res) => {
+    res.send("Payment successfull");
+})
+app.get("/cancel", (req, res) => {
+    res.send("Payment cancelled");
+})
 
 app.get('/', (req, res) => {
     res.send('Hello Snapem server running!' + staticFilePath);

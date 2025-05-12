@@ -8,7 +8,7 @@ const SubscriptionCardSchema = new mongoose.Schema({
   cardType: {
     type: String,
     required: true,
-    enum: ['monthly', 'quarterly', 'yearly'], // You can modify as needed
+    enum: ['basic', 'standard', 'premium'], // You can modify as needed
   },
   price: {
     type: Number,
