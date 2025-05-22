@@ -9,6 +9,8 @@ const ngrok = require("@ngrok/ngrok");
 const { role } = require('./src/helpers/global/validation.constants');
 const { hashPassword } = require('./src/helpers/utils/auth.utils');
 const helmet = require('helmet');
+const { subscriptionManagerWebhook } = require('./src/api/payment/payment.controller');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // const ngrok = require('ngrok');
 // const main = require('./src/utils/mail.utils');
 const app = express();
@@ -27,7 +29,7 @@ app.use(
     next();
   });
 
-app.use(express.json()); 
+// app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cors()); 
@@ -71,10 +73,31 @@ app.use('/api/video/sos/all/', express.static(staticVideoFilePath));
 
 
  
-app.use('/api', apiRouter);
-app.get("/success", (req, res) => {
-    res.send("Payment successfull");
-})
+app.use('/api',express.json(), apiRouter);
+app.use("/stripe/webhook", express.raw({type: 'application/json'}), subscriptionManagerWebhook),
+// app.get("/success", async(req, res) => {
+//     console.log(req.query.session_id, "session_id");
+//     const session = await stripe.checkout.sessions.retrieve(req.query.session_id,{expand:['subscription', 'subscription.plan.product',"customer"]});
+//     console.log(session, "session");
+//     const customerDetails = session.customer_details;
+// const billingAddress = customerDetails.address; // Includes: city, state, postal_code, country
+// const email = customerDetails.email;
+
+// const user = await User.findOne({ email }); // or use your session/auth system
+
+// if (user) {
+//   user.stripeCustomerId = session?.customer?.id;
+//   user.address = {
+//     country: billingAddress.country || '',
+//     state: billingAddress.state || '',
+//     city: billingAddress.city || '',
+//     pincode: billingAddress.postal_code || '',
+//   };
+//   await user.save();
+// }
+
+//     res.send("Payment successfull");
+// })
 app.get("/cancel", (req, res) => {
     res.send("Payment cancelled");
 })
