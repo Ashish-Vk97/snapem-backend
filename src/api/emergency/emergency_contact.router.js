@@ -6,8 +6,8 @@ const { createEmergencyContact ,getAllEmergencyContacts, getEmergencyById,update
 
 router.post('/create',authenticateToken,  createEmergencyContact);
 router.get('/', authenticateToken, getAllEmergencyContacts);
-router.get('/:id', getEmergencyById);
-router.put('/update/:id', updateEmergencyById);
-router.delete('/delete/:id', deleteEmergencyContact);
+router.get('/:id',authenticateToken, getEmergencyById);
+router.put('/update/:id',authenticateToken, updateEmergencyById);
+router.delete('/delete/:id',authenticateToken, deleteEmergencyContact);
 
 module.exports = router;

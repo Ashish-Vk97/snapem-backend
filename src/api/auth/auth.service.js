@@ -126,7 +126,7 @@ module.exports = {
           message: `Password reset link has been sent to your mail!`,
           link: `${
             process.env.WEB_URL
-          }/changePassword?token=${await generateToken({
+          }/changePassword/${await generateToken({
             id: users[0]._id.toString(),
             email: users[0].email,
             role: users[0].role,
