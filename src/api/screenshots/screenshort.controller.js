@@ -8,13 +8,13 @@ const fs = require('fs').promises;
 module.exports ={
     saveScreenshot: async (req, res) => {
         try {
-          const userId = req.user.id;
+          // const userId = req.user.id;
             const files = req.files;
-            console.log(files,"file====>")
+            // console.log(req.files,"file====>")
             if (!files.length > 0) {
                 return response.servicefailureResponse(res, "No files uploaded");
             }
-          
+         
          const result = await saveScreenshot(req); 
          console.log(result, 'result');
           

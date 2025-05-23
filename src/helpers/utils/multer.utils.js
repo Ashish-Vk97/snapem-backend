@@ -22,6 +22,10 @@ const storage = multer.diskStorage({
       cb(null, Date.now() + path.extname(file.originalname)); // Rename the file to avoid conflicts
     }
   });
+
+  const storageImg = multer.memoryStorage(); // Stores the files in memory buffer
+const uploadImg  = multer({ storage:storageImg, limits: { fileSize: 50 * 1024 * 1024 }, }); // 50MB limit
+
   
   const upload = multer({ storage: storage, limits: { fileSize: 50 * 1024 * 1024 }, });
-  module.exports = upload;
+  module.exports = {upload, uploadImg};

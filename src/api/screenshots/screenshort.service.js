@@ -1,3 +1,5 @@
+const s3 = require("../../helpers/utils/s3.utils");
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const User = require("../users/schemas/user.schema");
 const Screenshot = require("./schemas/screenshot.schema");
 
@@ -31,18 +33,47 @@ module.exports = {
           screenshots: [],
         });
       }
+      
 
-      files.forEach((file) => {
-        const imageLink = process.env.NODE_ENV === 'production' 
-          ? `${process.env.SERVER_URL}/api/screenshot/images/all/var/task/tmp/${file.filename}` 
-          : `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file.filename}`;
-        screenshotEntry.screenshots.push({
+      // files.forEach((file) => {
+      //   const imageLink = process.env.NODE_ENV === 'production' 
+      //     ? `${process.env.SERVER_URL}/api/screenshot/images/all/var/task/tmp/${file.filename}` 
+      //     : `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file.filename}`;
+      //   screenshotEntry.screenshots.push({
+      //     imageName: file.originalname,
+      //     imageLink: imageLink,
+      //     mimetype: file.mimetype,
+      //     size: file.size,
+      //   });
+      // });
+
+      
+//  const url = "https://snapem.s3.us-east-1.amazonaws.com/screenshots/1747996559171_node+issue+screenshot.png"
+    for (const file of files) {
+      const key = `screenshots/${Date.now()}_${file.originalname}`;
+      const updatedFilename = key.replace(/ /g, '+');
+      console.log(updatedFilename, "updatedFilename=====>");
+
+      const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: updatedFilename,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        // ACL: "public-read"
+      };
+
+    const location =   await s3.send(new PutObjectCommand(uploadParams));
+
+      // Push image metadata to array
+      screenshotEntry.screenshots.push({
           imageName: file.originalname,
-          imageLink: imageLink,
-          mimetype: file.mimetype,
+          imageLink: `${process.env.S3_BASE_URL}/${updatedFilename}`,
+           mimetype: file.mimetype,
           size: file.size,
+          Etag: location.ETag
         });
-      });
+    }
+    
 
       await screenshotEntry.save();
 
