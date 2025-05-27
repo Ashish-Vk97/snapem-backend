@@ -72,7 +72,7 @@ module.exports = {
         { $set: { ...data } },
         { new: true }
       );
-      if (!updatedEmergencyContact) {
+      if (!updatedEmergencyContact) { 
         return "Emergency contact not found";
       }
       return updatedEmergencyContact;

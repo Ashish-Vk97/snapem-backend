@@ -40,6 +40,7 @@ module.exports = {
     updateUser:async (req, res) => {    
         try {
             const data = req.body;
+            console.log(data, 'updateUser data');
 
             const failure = userValidation.updateUser.validate(data);
             if (failure.error) {
