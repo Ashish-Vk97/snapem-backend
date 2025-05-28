@@ -7,7 +7,7 @@ const EmergencycontactSchema = new Schema({
         ref: "User",
       },
     name: {type:String, required: true},
-    email: {type:String, required: true},
+    email: {type:String},
     phone: {type:String, required: true},
     status: {   type: String, enum: ['active', 'inactive'],   default: 'active' },
     isActive: {type: Boolean, default: true},
