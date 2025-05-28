@@ -5,7 +5,8 @@ const videoSosSchema = new Schema({
     videoName: { type: String, required: true },
     videoLink: { type: String, required: true },
     mimetype: { type: String, required: true },
-    size: { type: Number, required: true }, // in bytes
+    size: { type: Number, required: true },
+    Etag:{ type:String, required:true} // in bytes
 }, { _id: false });
 
 const videoSchema = new Schema({

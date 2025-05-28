@@ -12,7 +12,7 @@ module.exports = {
     role:joi.string().valid('ADMIN','USER').required(),
     email:joi.string().email().required().min(5).max(100),
     password:joi.string().required().min(5).max(100),
-    phone:joi.string().required().min(10).max(10),
+    phone:joi.string().required().min(10).max(15),
     gender:joi.string().valid('M','F','O').required().messages({
             'string.base': 'Gender must be a string.',
             'any.only': 'Gender must be one of the following: male, female, or other.',

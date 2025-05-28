@@ -22,6 +22,9 @@ const storage = multer.diskStorage({
       cb(null, Date.now() + path.extname(file.originalname)); // Rename the file to avoid conflicts
     }
   });
+
+  const storageVideo = multer.memoryStorage(); // Stores the files in memory buffer
+  const uploadVideo  = multer({ storage:storageVideo });
   
   const videoUpload = multer({ storage: storage });
-  module.exports = videoUpload;
+  module.exports = {videoUpload, uploadVideo};

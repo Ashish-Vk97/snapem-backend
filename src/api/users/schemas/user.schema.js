@@ -10,6 +10,17 @@ const userSchema = new Schema(
     role: { type: String, enum: ["ADMIN", "USER"], default: "USER" },
     phone: { type: String, required: true },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
+    location: {
+      type: {
+        type: String, // 'Point'
+        enum: ["Point"],
+        // required: true,
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        // required: true,
+      },
+    },
     profileImage: { type: String, default: null },
     stripeCustomerId: {
       type: String,
@@ -29,13 +40,14 @@ const userSchema = new Schema(
       id: { type: String },
       status: { type: String },
       start_date: { type: String },
+
       cancellation_details: {
         comment: { type: String, default: null },
         feedback: { type: String, default: null },
         reason: { type: String, default: null },
       },
-      canceled_at: { type: String , default: null },
-      cancel_at_period_end: { type: Boolean , default: false },
+      canceled_at: { type: String, default: null },
+      cancel_at_period_end: { type: Boolean, default: false },
       current_period_end: { type: String },
       current_period_start: { type: String },
       plan: {

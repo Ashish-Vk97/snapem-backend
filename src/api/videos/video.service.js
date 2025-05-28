@@ -1,3 +1,5 @@
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = require("../../helpers/utils/s3.utils");
 const User = require("../users/schemas/user.schema");
 const Video = require("./schemas/video.schema");
 
@@ -17,7 +19,7 @@ module.exports = {
     
         
     
-          console.log(userId, req.user, "userId=====>");
+          console.log(userId, req.user, files, "userId=====>");
           let videoEntry = await Video.findOne({
             user: userId,
             date: dateOnly,
@@ -27,19 +29,45 @@ module.exports = {
             videoEntry = new Video({
               user: userId,
               date: dateOnly,
-             videos: [],
+              videos: [],
             });
           }
     
-          files.forEach((file) => {
-            const imageLink = `${process.env.SERVER_URL}/api/video/sos/all/videoupload/${file.filename}`;
-            videoEntry.videos.push({
-              videoName: file.originalname,
-              videoLink: imageLink,
-              mimetype: file.mimetype,
-              size: file.size,
-            });
-          });
+          // files.forEach((file) => {
+          //   const imageLink = `${process.env.SERVER_URL}/api/video/sos/all/videoupload/${file.filename}`;
+          //   videoEntry.videos.push({
+          //     videoName: file.originalname,
+          //     videoLink: imageLink,
+          //     mimetype: file.mimetype,
+          //     size: file.size,
+          //   });
+          // });
+
+           for (const file of files) {
+                const key = `videos/${Date.now()}_${file.originalname}`;
+                // const updatedFilename = key.replace(/ /g, '+');
+                // console.log(updatedFilename, "updatedFilename=====>");
+          
+                const uploadParams = {
+                  Bucket: process.env.AWS_BUCKET_NAME,
+                  Key: key,
+                  Body: file.buffer,
+                  ContentType: file.mimetype,
+                  // ACL: "public-read"
+                };
+          
+              const location =   await s3.send(new PutObjectCommand(uploadParams));
+          
+                // Push image metadata to array
+                videoEntry.videos.push({
+                    videoName: file.originalname,
+                    videoLink: `${process.env.S3_BASE_URL}/${key}`,
+                     mimetype: file.mimetype,
+                    size: file.size,
+                    Etag: location.ETag
+                  });
+              }
+              
     
           await videoEntry.save();
     
