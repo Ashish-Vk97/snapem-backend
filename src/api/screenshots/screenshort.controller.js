@@ -2,7 +2,7 @@ const response = require('../../helpers/utils/api-response/response.function');
 const path = require('path');
 const Screenshot = require('./schemas/screenshot.schema');
 const User = require('../users/schemas/user.schema');
-const { saveScreenshot, getAllScreenshots } = require('./screenshort.service');
+const { saveScreenshot, getAllScreenshots, getAllScreenshotsById } = require('./screenshort.service');
 const fs = require('fs').promises;
 
 module.exports ={
@@ -52,6 +52,25 @@ module.exports ={
         //         images: filePaths
         //   }
           const result = await getAllScreenshots(req);
+          
+          if( result && typeof result !== 'string'){
+    
+              return response.successResponse(res, result, 'screenshot folders fetched successfully');   
+          }
+           return response.servicefailureResponse(res, result);
+              
+         
+          
+        
+        } catch (error) {
+          // Handle errors
+          return response.internalFailureResponse(res, error.message);
+        }
+      },
+       getAllScreenshotsById: async (req, res) => {
+        try {
+                     
+          const result = await getAllScreenshotsById(req);
           
           if( result && typeof result !== 'string'){
     

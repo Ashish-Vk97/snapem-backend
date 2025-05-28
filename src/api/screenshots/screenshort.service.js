@@ -50,7 +50,8 @@ module.exports = {
       
 //  const url = "https://snapem.s3.us-east-1.amazonaws.com/screenshots/1747996559171_node+issue+screenshot.png"
     for (const file of files) {
-      const key = `screenshots/${Date.now()}_${file.originalname}`;
+      const ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
+      const key = `screenshots/${Date.now()}_screenshot_snapem${ext}`;
       const updatedFilename = key.replace(/ /g, '+');
       console.log(updatedFilename, "updatedFilename=====>");
 
@@ -59,7 +60,7 @@ module.exports = {
         Key: updatedFilename,
         Body: file.buffer,
         ContentType: file.mimetype,
-        // ACL: "public-read"
+        ACL: "public-read"
       };
 
     const location =   await s3.send(new PutObjectCommand(uploadParams));
@@ -105,7 +106,8 @@ module.exports = {
 
       console.log(query, "query=====>");
 
-      const screenshots = await Screenshot.find(query);
+      // const screenshots = await Screenshot.find(query);
+      const screenshots = await Screenshot.find(query).select('-screenshots');
       if (!screenshots || screenshots.length === 0) {
         return "No screenshots found for this user.";
       }
@@ -115,4 +117,17 @@ module.exports = {
       return error.message;
     }
   },
+  getAllScreenshotsById: async (req) => {
+    const { id } = req.params;
+    try {
+      const screenshot = await Screenshot.findById(id).select("-__v -user");
+      if (!screenshot) {
+        return "Screenshots not found";
+      }
+      return screenshot;
+    } catch (error) {
+      console.error("Error fetching screenshot by ID:", error);
+      return error.message;
+    }
+  }
 };
