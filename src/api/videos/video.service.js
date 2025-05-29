@@ -2,6 +2,7 @@ const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = require("../../helpers/utils/s3.utils");
 const User = require("../users/schemas/user.schema");
 const Video = require("./schemas/video.schema");
+const moment = require("moment");
 
 module.exports = {
     saveSosVideos: async (req) => {
@@ -44,7 +45,9 @@ module.exports = {
           // });
 
            for (const file of files) {
-                const key = `videos/${Date.now()}_${file.originalname}`;
+                // const key = `videos/${Date.now()}_${file.originalname}`;
+                const ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
+             const key = `videos/${Date.now()}_videos_snapem${ext}`;
                 // const updatedFilename = key.replace(/ /g, '+');
                 // console.log(updatedFilename, "updatedFilename=====>");
           
@@ -91,14 +94,32 @@ module.exports = {
       getAllSosVideos: async (req) => {
           try {
             const userId = req.user.id;
-            const videos = await Video.find({ user: userId });
-            if (!videos) {
-              return "No screenshots found for this user.";
+            const videos = await Video.find({ user: userId }).select('-videos');
+            if (!videos || videos.length === 0) {
+              return "No videos found for this user.";
             }
-            return videos;
+           
+               const formattedVideos = videos.map(item => ({
+                 ...item.toObject(),
+                  date: moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss') 
+               }));
+            return formattedVideos;
           } catch (error) {
-            console.error("Error fetching screenshots:", error);
+            console.error("Error fetching videos:", error);
             return error.message;
           }
-        }
+        },
+
+          getAllSosVideosById: async (req) => {
+            const { id } = req.params;
+            try {
+              const video = await Video.findById(id).select('-__v');
+              if (!video) {
+                return "Video not found";
+              }
+              return video;
+            } catch (error) {
+              return error?.message;
+            }
+          }
 }

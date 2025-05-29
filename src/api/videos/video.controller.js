@@ -1,6 +1,6 @@
 const response = require("../../helpers/utils/api-response/response.function");
 const Emergencycontact = require("../emergency/schemas/emergency_contact.schema");
-const { saveSosVideos, getAllSosVideos } = require("./video.service");
+const { saveSosVideos, getAllSosVideos, getAllSosVideosById } = require("./video.service");
 const mailer = require("../../helpers/utils/mail.utils");
 const User = require("../users/schemas/user.schema");
 
@@ -74,7 +74,7 @@ module.exports = {
             html: `
                     <p>Hello,</p>
                     <p>An SOS video has been uploaded by your contact. You can view it using the link below:</p>
-                    <p><a href="${videoLink}">CLICK </a></p>
+                    <p><a href="${videoLink}">CLICK ViDEO </a></p>
                     <p>Stay safe.</p>
                 `,
           });
@@ -100,7 +100,7 @@ module.exports = {
         return response.successResponse(
           res,
           result,
-          "All video files fetched successfully"
+          "All video folders fetched successfully"
         );
       }
       return response.servicefailureResponse(res, result);
@@ -109,4 +109,20 @@ module.exports = {
       return response.internalFailureResponse(res, error.message);
     }
   },
+  getAllSosVideosById: async (req, res) => {
+    try {
+      const result = await getAllSosVideosById(req);
+
+      if (result && typeof result !== "string") {
+        return response.successResponse(
+          res,
+          result,
+          "Video details list fetched successfully"
+        );
+      }
+      return response.servicefailureResponse(res, result);
+    } catch (error) {
+      return response.internalFailureResponse(res, error.message);
+    }
+  }
 };

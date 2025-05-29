@@ -2,6 +2,8 @@ const s3 = require("../../helpers/utils/s3.utils");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const User = require("../users/schemas/user.schema");
 const Screenshot = require("./schemas/screenshot.schema");
+const moment = require("moment");
+
 
 
 module.exports = {
@@ -111,7 +113,14 @@ module.exports = {
       if (!screenshots || screenshots.length === 0) {
         return "No screenshots found for this user.";
       }
-      return screenshots;
+
+        const formattedScreenshots = screenshots.map(item => ({
+    ...item.toObject(),
+     date: moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss') 
+  }));
+
+  console.log(formattedScreenshots, "formattedScreenshots=====>");
+      return formattedScreenshots; 
     } catch (error) {
       console.error("Error fetching screenshots:", error);
       return error.message;
