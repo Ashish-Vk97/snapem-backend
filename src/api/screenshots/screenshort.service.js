@@ -4,8 +4,6 @@ const User = require("../users/schemas/user.schema");
 const Screenshot = require("./schemas/screenshot.schema");
 const moment = require("moment");
 
-
-
 module.exports = {
   saveScreenshot: async (req) => {
     try {
@@ -18,9 +16,7 @@ module.exports = {
         today.getMonth(),
         today.getDate()
       );
-    //   console.log(dateOnly, "dateOnly=====>");
-
-    
+      //   console.log(dateOnly, "dateOnly=====>");
 
       console.log(userId, req.user, "userId=====>");
       let screenshotEntry = await Screenshot.findOne({
@@ -35,11 +31,10 @@ module.exports = {
           screenshots: [],
         });
       }
-      
 
       // files.forEach((file) => {
-      //   const imageLink = process.env.NODE_ENV === 'production' 
-      //     ? `${process.env.SERVER_URL}/api/screenshot/images/all/var/task/tmp/${file.filename}` 
+      //   const imageLink = process.env.NODE_ENV === 'production'
+      //     ? `${process.env.SERVER_URL}/api/screenshot/images/all/var/task/tmp/${file.filename}`
       //     : `${process.env.SERVER_URL}/api/screenshot/images/all/uploads/${file.filename}`;
       //   screenshotEntry.screenshots.push({
       //     imageName: file.originalname,
@@ -49,34 +44,34 @@ module.exports = {
       //   });
       // });
 
-      
-//  const url = "https://snapem.s3.us-east-1.amazonaws.com/screenshots/1747996559171_node+issue+screenshot.png"
-    for (const file of files) {
-      const ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
-      const key = `screenshots/${Date.now()}_screenshot_snapem${ext}`;
-      const updatedFilename = key.replace(/ /g, '+');
-      console.log(updatedFilename, "updatedFilename=====>");
+      //  const url = "https://snapem.s3.us-east-1.amazonaws.com/screenshots/1747996559171_node+issue+screenshot.png"
+      for (const file of files) {
+        const ext = file.originalname.substring(
+          file.originalname.lastIndexOf(".")
+        );
+        const key = `screenshots/${Date.now()}_screenshot_snapem${ext}`;
+        const updatedFilename = key.replace(/ /g, "+");
+        console.log(updatedFilename, "updatedFilename=====>");
 
-      const uploadParams = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: updatedFilename,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-        ACL: "public-read"
-      };
+        const uploadParams = {
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: updatedFilename,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          ACL: "public-read",
+        };
 
-    const location =   await s3.send(new PutObjectCommand(uploadParams));
+        const location = await s3.send(new PutObjectCommand(uploadParams));
 
-      // Push image metadata to array
-      screenshotEntry.screenshots.push({
+        // Push image metadata to array
+        screenshotEntry.screenshots.push({
           imageName: file.originalname,
           imageLink: `${process.env.S3_BASE_URL}/${updatedFilename}`,
-           mimetype: file.mimetype,
+          mimetype: file.mimetype,
           size: file.size,
-          Etag: location.ETag
+          Etag: location.ETag,
         });
-    }
-    
+      }
 
       await screenshotEntry.save();
 
@@ -101,7 +96,7 @@ module.exports = {
 
       const query = { user: userId };
       if (startDate || endDate) {
-        query.date = {};      
+        query.date = {};
         if (startDate) query.date.$gte = new Date(startDate);
         if (endDate) query.date.$lte = new Date(endDate);
       }
@@ -109,18 +104,20 @@ module.exports = {
       console.log(query, "query=====>");
 
       // const screenshots = await Screenshot.find(query);
-      const screenshots = await Screenshot.find(query).select('-screenshots');
+      const screenshots = await Screenshot.find(query).select("-screenshots");
       if (!screenshots || screenshots.length === 0) {
         return "No screenshots found for this user.";
       }
 
-        const formattedScreenshots = screenshots.map(item => ({
-    ...item.toObject(),
-     date: moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss') 
-  }));
+      const formattedScreenshots = screenshots.map((item) => ({
+        ...item.toObject(),
+        date: moment(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+        createdAt: moment(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+        updatedAt: moment(item.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+      }));
 
-  console.log(formattedScreenshots, "formattedScreenshots=====>");
-      return formattedScreenshots; 
+      console.log(formattedScreenshots, "formattedScreenshots=====>");
+      return formattedScreenshots;
     } catch (error) {
       console.error("Error fetching screenshots:", error);
       return error.message;
@@ -133,10 +130,19 @@ module.exports = {
       if (!screenshot) {
         return "Screenshots not found";
       }
-      return screenshot;
+      console.log(screenshot, "screenshot=====>");
+      const formattedScreenshot = {
+        ...screenshot.toObject(),
+        date: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+        createdAt: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+        updatedAt: moment(screenshot.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+      };
+
+      console.log(formattedScreenshot, "formattedScreenshot=====>");
+      return formattedScreenshot;
     } catch (error) {
       console.error("Error fetching screenshot by ID:", error);
       return error.message;
     }
-  }
+  },
 };
