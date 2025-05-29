@@ -6,7 +6,7 @@ const salt = bcrypt.genSaltSync(10)
 const JWT_SECRET = process.env.JWT_SECRET || "12GDHDHDYET34BBCHCHGSJSNSBHDTCYR";
 module.exports = {
     generateToken: async (data) => {
-        return await jwt.sign(data, JWT_SECRET, { expiresIn: '1d' });
+        return await jwt.sign(data, JWT_SECRET, { expiresIn: '7d' });
     },
     comparePassword: async (password, hash) => {
         return bcrypt.compare(password,hash);
