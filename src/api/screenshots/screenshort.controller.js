@@ -10,7 +10,7 @@ module.exports ={
         try {
           // const userId = req.user.id;
             const files = req.files;
-            // console.log(req.files,"file====>")
+            console.log(req.files,"file====>")
             if (!files?.length > 0) {
                 return response.servicefailureResponse(res, "No files uploaded");
             }
