@@ -3,6 +3,7 @@ const Emergencycontact = require("../emergency/schemas/emergency_contact.schema"
 const { saveSosVideos, getAllSosVideos, getAllSosVideosById } = require("./video.service");
 const mailer = require("../../helpers/utils/mail.utils");
 const User = require("../users/schemas/user.schema");
+const { sendSMS } = require("../../helpers/utils/smsSender");
 
 function parseLocationString(str) {
   const latMatch = str.match(/Lat:\s*(-?\d+(\.\d+)?)/);
@@ -30,7 +31,7 @@ module.exports = {
   saveSosVideos: async (req, res) => {
     try {
       
-
+    //  await sendSMS();
       // const userId = req.user.id;
       const files = req.files;
       console.log(files, req.body, "file====>");

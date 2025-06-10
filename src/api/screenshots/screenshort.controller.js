@@ -2,7 +2,7 @@ const response = require('../../helpers/utils/api-response/response.function');
 const path = require('path');
 const Screenshot = require('./schemas/screenshot.schema');
 const User = require('../users/schemas/user.schema');
-const { saveScreenshot, getAllScreenshots, getAllScreenshotsById } = require('./screenshort.service');
+const { saveScreenshot, getAllScreenshots, getAllScreenshotsById, deleteScreenshots } = require('./screenshort.service');
 const fs = require('fs').promises;
 
 module.exports ={
@@ -100,11 +100,17 @@ module.exports ={
     //         return res.status(500).json({ message: error.message });
     //     }
     // },
-    // deleteScreenshot: async (req, res) => {
-    //     try {
-    //         return res.status(200).json({ message: 'Screenshot deleted successfully' });
-    //     } catch (error) {
-    //         return res.status(500).json({ message: error.message });
-    //     }
-    // }
+    deleteScreenshots: async (req, res) => {
+        try {
+
+           const result = await deleteScreenshots(req);
+     if( result && typeof result !== 'string'){
+    
+              return response.successResponse(res, result, 'screenshot files deleted successfully');   
+          }
+           return response.servicefailureResponse(res, result);
+        } catch (error) {
+             return response.internalFailureResponse(res, error.message);
+        }
+    }
 }

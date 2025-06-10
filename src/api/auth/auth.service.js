@@ -17,8 +17,11 @@ module.exports = {
         return "Email or password is incorrect. Please try again.";
       }
       if (!user.isActive) {
-        return "User is not active";
+        return "You are currently inactive. Please contact your Admin.";
       }
+      // if (user.role === "USER" && !user.isSubscribed) {
+      //   return "You have no subscription. Please purchase your plan.";
+      // }
 
       // if(user.isDelete) {
       //     return  'User is deleted';

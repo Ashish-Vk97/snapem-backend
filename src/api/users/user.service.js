@@ -102,5 +102,31 @@ module.exports = {
       // logger.error(`Change password service failed: ${error.message}`);
       console.log(error.message);
     }
+  },
+  updateUserStatus : async (userId, status) => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) return "Invalid user id!";
+    
+    let active_status;
+    if (status === "inactive" || status === "false") {
+      active_status = false;
+    } else if (status === "active" || status === "true") {
+      active_status = true;
+    }
+    
+    return await User.findByIdAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        isActive: active_status,
+      },
+      { new: true }
+    );
+    
+  } catch (error) {
+   
+    console.log(error.message);
   }
+}
 };

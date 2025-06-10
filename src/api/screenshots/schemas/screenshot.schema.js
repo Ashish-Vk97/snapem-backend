@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const screenshotImageSchema = new Schema({
+    _id:{ type: String, default: () => new mongoose.Types.ObjectId().toString() },
     imageName: { type: String, required: true },
     imageLink: { type: String, required: true },
     mimetype: { type: String, required: true },
     size: { type: Number, required: true }, 
-    Etag: { type: String, required: true }, // in bytes
+    Etag: { type: String, required: true },
+    s3Key:{type: String, required:true} // in bytes
 }, { _id: false });
 
 const screenshotSchema = new Schema({

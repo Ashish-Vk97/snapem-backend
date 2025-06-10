@@ -10,11 +10,24 @@ const { role } = require('./src/helpers/global/validation.constants');
 const { hashPassword } = require('./src/helpers/utils/auth.utils');
 const helmet = require('helmet');
 const { subscriptionManagerWebhook } = require('./src/api/payment/payment.controller');
+const { runCleanupJob } = require('./src/helpers/utils/cleanupScreenshot.utils');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const cron = require("node-cron");
 // const ngrok = require('ngrok');
 // const main = require('./src/utils/mail.utils');
+
 const app = express();
 const port = process.env.PORT || 3000;
+
+
+  
+ cron.schedule("0 0 * * *", async () => {
+    // Run the cleanup job every 10 minutes
+    // cron.schedule("*/5 * * * *", async () => {
+        console.log("Running backup...");
+        const startTime = new Date();
+        await runCleanupJob(startTime);
+    });
 
 
 app.use(
@@ -28,11 +41,12 @@ app.use(
     res.setHeader('X-Frame-Options', 'ALLOWALL'); 
     next();
   });
-
+ 
 // app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cors()); 
+
 
 
 mongoose.connect(process.env.MONGODB_URI)

@@ -1,8 +1,9 @@
 const s3 = require("../../helpers/utils/s3.utils");
-const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const User = require("../users/schemas/user.schema");
 const Screenshot = require("./schemas/screenshot.schema");
 const moment = require("moment");
+const { default: mongoose } = require("mongoose");
 
 module.exports = {
   saveScreenshot: async (req) => {
@@ -62,9 +63,12 @@ module.exports = {
         };
 
         const location = await s3.send(new PutObjectCommand(uploadParams));
+         const screenshotId = new mongoose.Types.ObjectId();
 
         // Push image metadata to array
         screenshotEntry.screenshots.push({
+          _id: screenshotId,
+          s3Key: updatedFilename,
           imageName: file.originalname,
           imageLink: `${process.env.S3_BASE_URL}/${updatedFilename}`,
           mimetype: file.mimetype,
@@ -76,14 +80,18 @@ module.exports = {
       await screenshotEntry.save();
 
       const user = await User.findById(userId);
-      if (!user.screenshots) user.screenshots = [];
+      console.log(user, "user=====>");
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (!user?.screenshotsList) user.screenshotsList = [];
 
       if (!user.screenshotsList.includes(screenshotEntry._id)) {
-        user.screenshotsList.push(screenshotEntry._id);
+        user?.screenshotsList.push(screenshotEntry._id);
         await user.save();
       }
       console.log(screenshotEntry, "screenshotEntry service=====>");
-      return screenshotEntry;
+      return screenshotEntry; 
     } catch (error) {
       console.error("Error saving screenshot:", error);
       return error.message;
@@ -142,6 +150,52 @@ module.exports = {
       return formattedScreenshot;
     } catch (error) {
       console.error("Error fetching screenshot by ID:", error);
+      return error.message;
+    }
+  },
+  deleteScreenshots: async (req) => {
+    
+    try {
+      // const screenshot = await Screenshot.findByIdAndDelete(id);
+      // if (!screenshot) {
+      //   return "Screenshot not found";
+      // }
+        const { screenshotEntryId, screenshotIds = [],deleteAll = false } = req.body;
+    const userId = req.user.id;
+
+    const screenshotEntry = await Screenshot.findOne({
+      _id: screenshotEntryId,
+      user: userId,
+    });
+
+    if (!screenshotEntry) return "Screenshot not found";
+       const screenshotsToDelete = deleteAll
+      ? screenshotEntry.screenshots
+      : screenshotEntry.screenshots.filter(s =>
+          screenshotIds.includes(s._id.toString())
+        );
+
+      //  const remainingScreenshots = [];
+       for (const screenshot of screenshotsToDelete) {
+      if (screenshot.s3Key) {
+        const deleteParams = {
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: screenshot.s3Key,
+        };
+        await s3.send(new DeleteObjectCommand(deleteParams));
+      }
+    }
+
+    // Filter out deleted screenshots
+    screenshotEntry.screenshots = screenshotEntry.screenshots.filter(
+      s => !screenshotsToDelete.some(d => d._id.toString() === s._id.toString())
+    );
+    await screenshotEntry.save();
+
+      // console.log(screenshot, "screenshot=====>");
+      return {screenshots :screenshotEntry.screenshots};
+    } catch (error) {
+      console.error("Error deleting screenshot:", error);
       return error.message;
     }
   },

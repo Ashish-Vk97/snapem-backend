@@ -41,4 +41,18 @@ module.exports = {
     password: validations.password,
     // confirm_password:validations.password,
   }),
+  updateUserStatus: joi.object().keys({
+    status: joi
+      .string()
+      .valid("inactive", "active")
+      .required()
+      .messages({
+        "any.only": "Status must be either 'inactive' or 'active'",
+        "any.required": "Status is required",
+      }),
+       userId: validations.string.allow("").optional()
+
+  }),
+
+ 
 };
