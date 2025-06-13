@@ -3,6 +3,7 @@ const s3 = require("../../helpers/utils/s3.utils");
 const User = require("../users/schemas/user.schema");
 const Video = require("./schemas/video.schema");
 const moment = require("moment");
+const { default: mongoose } = require("mongoose");
 
 module.exports = {
   saveSosVideos: async (req) => {
@@ -60,9 +61,13 @@ module.exports = {
         };
 
         const location = await s3.send(new PutObjectCommand(uploadParams));
+        const videoId = new mongoose.Types.ObjectId();
+        const updatedFilename = key.replace(/ /g, "+");
 
         // Push image metadata to array
         videoEntry.videos.push({
+          _id: videoId,
+          s3Key: updatedFilename,
           videoName: file.originalname,
           videoLink: `${process.env.S3_BASE_URL}/${key}`,
           mimetype: file.mimetype,
@@ -89,8 +94,11 @@ module.exports = {
   },
   getAllSosVideos: async (req) => {
     try {
+       const {  id } = req.query;
       const userId = req.user.id;
-      const videos = await Video.find({ user: userId }).select("-videos");
+       const query = { user: id ? id : userId };
+
+      const videos = await Video.find(query).select("-videos");
       if (!videos || videos.length === 0) {
         return "No videos found for this user.";
       }

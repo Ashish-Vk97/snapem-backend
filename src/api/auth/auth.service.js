@@ -8,7 +8,7 @@ const {
 const { role } = require("../../helpers/global/validation.constants");
 const mailer = require("../../helpers/utils/mail.utils");
 module.exports = {
-  signIn: async (data) => {
+  signIn: async (data,req) => {
     const { email, password } = data;
     try {
       const user = await User.findOne({ email });
@@ -19,9 +19,19 @@ module.exports = {
       if (!user.isActive) {
         return "You are currently inactive. Please contact your Admin.";
       }
-      // if (user.role === "USER" && !user.isSubscribed) {
-      //   return "You have no subscription. Please purchase your plan.";
-      // }
+      // Check if request is from a mobile device
+      // Assume 'data.req' contains the Express request object
+      let isMobile = false;
+      if (req && req.headers && req.headers['user-agent']) {
+        const userAgent = req.headers['user-agent'];
+        console.log(userAgent, "userAgent in auth service");
+        // Simple mobile detection (can be improved with a library)
+        isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
+      }
+
+      if (user.role === "USER" && !user.isSubscribed && isMobile) {
+        return "You have no subscription. Please purchase your plan.";
+      }
 
       // if(user.isDelete) {
       //     return  'User is deleted';

@@ -12,7 +12,7 @@ module.exports = {
         return response.failedValidationResponse(res, failure, null);
       }
 
-      const result = await service.signIn(data);
+      const result = await service.signIn(data,req);
       if (result && typeof result !== "string") {
         return response.successResponse(res, result);
       }

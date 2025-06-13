@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const videoSosSchema = new Schema({
+    _id:{ type: String, default: () => new mongoose.Types.ObjectId().toString() },
     videoName: { type: String, required: true },
     videoLink: { type: String, required: true },
     mimetype: { type: String, required: true },
     size: { type: Number, required: true },
-    Etag:{ type:String, required:true} // in bytes
+    Etag:{ type:String, required:true}, // in bytes
+     s3Key:{type: String, required:true} 
 }, { _id: false });
 
 const videoSchema = new Schema({

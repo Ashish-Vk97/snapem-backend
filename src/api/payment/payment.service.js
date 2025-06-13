@@ -203,6 +203,8 @@ module.exports = {
          const subscription = event.data.object;
   const stripeCustomerId = subscription.customer;
 
+  console.log(subscription, "subscription updated in webhook");
+
   // Find the user by their Stripe customer ID
   const user = await User.findOne({ stripeCustomerId });
 
@@ -237,7 +239,7 @@ module.exports = {
   };
 
   // Update flags
-   user.isSubscribed =  subscription.canceled_at?.toString() && subscription.cancel_at_period_end === false ? false : true;
+   user.isSubscribed =  subscription.canceled_at?.toString() && subscription.cancel_at_period_end === true ? false : true;
   user.status = subscription.status;
   
 

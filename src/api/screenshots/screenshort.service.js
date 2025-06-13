@@ -100,9 +100,9 @@ module.exports = {
   getAllScreenshots: async (req) => {
     try {
       const userId = req.user.id;
-      const { startDate, endDate } = req.query;
+      const { startDate, endDate, id } = req.query;
 
-      const query = { user: userId };
+      const query = { user: id ? id : userId };
       if (startDate || endDate) {
         query.date = {};
         if (startDate) query.date.$gte = new Date(startDate);
@@ -154,14 +154,14 @@ module.exports = {
     }
   },
   deleteScreenshots: async (req) => {
-    
+     const {  id } = req.query;
     try {
       // const screenshot = await Screenshot.findByIdAndDelete(id);
       // if (!screenshot) {
       //   return "Screenshot not found";
       // }
         const { screenshotEntryId, screenshotIds = [],deleteAll = false } = req.body;
-    const userId = req.user.id;
+    const userId = id ? id : req.user.id;
 
     const screenshotEntry = await Screenshot.findOne({
       _id: screenshotEntryId,
