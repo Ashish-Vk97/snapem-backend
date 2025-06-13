@@ -11,8 +11,8 @@ module.exports = {
       }
       console.log(req.user.id, contactData,"userId==================>");
       // Check if user already has 5 emergency contacts
-      const existingContactsCount = await Emergencycontact.countDocuments({ userId: req.user.id });
-      if (existingContactsCount >= 5) {
+      const existingContacts = await Emergencycontact.find({ userId: req.user.id });
+      if (existingContacts.length >= 5) {
         return "you can not create more than 5 emergency contacts";
       }
       const contact = new Emergencycontact(contactData);
