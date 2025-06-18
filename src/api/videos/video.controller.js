@@ -1,6 +1,6 @@
 const response = require("../../helpers/utils/api-response/response.function");
 const Emergencycontact = require("../emergency/schemas/emergency_contact.schema");
-const { saveSosVideos, getAllSosVideos, getAllSosVideosById } = require("./video.service");
+const { saveSosVideos, getAllSosVideos, getAllSosVideosById, deleteSosVideos } = require("./video.service");
 const mailer = require("../../helpers/utils/mail.utils");
 const User = require("../users/schemas/user.schema");
 const { sendSMS } = require("../../helpers/utils/smsSender");
@@ -31,7 +31,7 @@ module.exports = {
   saveSosVideos: async (req, res) => {
     try {
       
-    //  await sendSMS();
+   
       // const userId = req.user.id;
       const files = req.files;
       console.log(files, req.body, "file====>");
@@ -65,20 +65,27 @@ module.exports = {
           console.log("No emergency contacts found for user");
         }
 
-        const videoLink = result.videos[0]?.videoLink;
+        const videoLink = result.videos[result.videos.length - 1]?.videoLink;
 
         // ✅ 4. Send email to each contact
         for (const To of contacts) {
-          await mailer.sendMail({
-            to: To?.email,
-            subject: "Emergency SOS Video Received",
-            html: `
-                    <p>Hello,</p>
-                    <p>An SOS video has been uploaded by your contact. You can view it using the link below:</p>
-                    <p><a href="${videoLink}">CLICK ViDEO </a></p>
-                    <p>Stay safe.</p>
-                `,
-          });
+          if (!To?.phone) continue;
+
+            await sendSMS({
+              recipient: To?.phone,
+              content: `Hello ${To?.name ||"Dear"} please Help me  Watch SOS video: ${videoLink}`,
+            });
+
+          // await mailer.sendMail({
+          //   to: To.email,
+          //   subject: "Emergency SOS Video Received",
+          //   html: `
+          //     <p>Hello,</p>
+          //     <p>An SOS video has been uploaded by your contact. You can view it using the link below:</p>
+          //     <p><a href="${videoLink}">CLICK ViDEO </a></p>
+          //     <p>Stay safe.</p>
+          //   `,
+          // });
         }
 
         return response.successResponse(
@@ -125,5 +132,18 @@ module.exports = {
     } catch (error) {
       return response.internalFailureResponse(res, error.message);
     }
-  }
+  },
+  deleteSosVideos: async(req,res)=>{
+     try {
+
+           const result = await deleteSosVideos(req);
+     if( result && typeof result !== 'string'){
+    
+              return response.successResponse(res, result, 'video files deleted successfully');   
+          }
+           return response.servicefailureResponse(res, result);
+        } catch (error) {
+             return response.internalFailureResponse(res, error.message);
+        }
+  } 
 };

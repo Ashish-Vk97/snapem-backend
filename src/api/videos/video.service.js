@@ -1,4 +1,4 @@
-const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = require("../../helpers/utils/s3.utils");
 const User = require("../users/schemas/user.schema");
 const Video = require("./schemas/video.schema");
@@ -57,7 +57,7 @@ module.exports = {
           Key: key,
           Body: file.buffer,
           ContentType: file.mimetype,
-          // ACL: "public-read"
+          ACL: "public-read"
         };
 
         const location = await s3.send(new PutObjectCommand(uploadParams));
@@ -134,6 +134,46 @@ module.exports = {
       return formattedVideo;
     } catch (error) {
       return error?.message;
+    }
+  },
+  deleteSosVideos: async (req) => {
+      const {  id } = req.query;
+    try {
+      
+        const { videoEntryId, videoIds = [],deleteAll = false } = req.body;
+    const userId = id ? id : req.user.id;
+
+      const videoEntry = await Video.findOne({
+          _id: videoEntryId,
+          user: userId,
+        });
+
+        if (!videoEntry) return "Video not found";
+           const videosToDelete = deleteAll
+          ? videoEntry.videos
+          : videoEntry.videos.filter(v =>
+              videoIds.includes(v._id.toString())
+            );
+
+      for (const video of videosToDelete) {
+      if (video.s3Key) {
+        const deleteParams = {
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: video.s3Key,
+        };
+        await s3.send(new DeleteObjectCommand(deleteParams));
+      }
+    }
+
+    // Filter out deleted videos
+    videoEntry.videos = videoEntry.videos.filter(
+      v => !videosToDelete.some(d => d._id.toString() === v._id.toString())
+    );
+    await videoEntry.save();
+    return {videos :videoEntry.videos};
+    } catch (error) {
+      console.error("Error deleting videos:", error);
+      return error.message;
     }
   },
 };

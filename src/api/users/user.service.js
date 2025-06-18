@@ -128,5 +128,31 @@ module.exports = {
    
     console.log(error.message);
   }
+},
+ userFreeAccess : async (userId, status) => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) return "Invalid user id!";
+    
+    let isFreeAccess = false;
+    if (status === "inactive" || status === "false") {
+      isFreeAccess = false;
+    } else if (status === "active" || status === "true") {
+      isFreeAccess = true;
+    }
+    
+    return await User.findByIdAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        isFreeAccess: isFreeAccess,
+      },
+      { new: true }
+    );
+    
+  } catch (error) {
+   
+    console.log(error.message);
+  }
 }
 };

@@ -6,32 +6,29 @@
 
 // const smsApi = new brevo.TransactionalSMSApi();
 
-   const SibApiV3Sdk = require('@getbrevo/brevo');
+   const Brevo = require('@getbrevo/brevo');
+   const brevoClient = new Brevo.TransactionalSMSApi();
+const apiKey = process.env.BREVO_SNAPEM_API_KEY; // Replace with your actual API key
+brevoClient.setApiKey(Brevo.TransactionalSMSApiApiKeys.apiKey, apiKey);
 
  
-//    let apiInstance = new SibApiV3Sdk.TransactionalSMSApi();
-//    let apiKey = apiInstance.apiClient.authentications['api-key'];
-//    apiKey.apiKey = process.env.BREVO_SMS_KEY; // Replace with your actual API key
 
-//    let sendSms = new SibApiV3Sdk.SendSms();
 
 
 
 module.exports = {
-  sendSMS: async () => {
-    // const smsApi = new brevo.TransactionalSMSApi();
+  sendSMS: async ({ recipient, content }) => {
+  const sendTransacSms = {
+  sender: 'SNAPEM', // Must be an approved sender ID for some countries
+  recipient: `+91${recipient}` || '+917787923930', // International format (E.164)
+  content: content || 'Hello Dear please Help me  Watch SOS video: https://snapem.s3.us-east-1.amazonaws.com/videos/1749974515657_videos_snapem.mp4',
+  type: 'transactional'
+};
 
-    // const sendTransacSms = new brevo.SendTransacSms();
-    // sendTransacSms.sender = "snapem";
-    // sendTransacSms.recipient = "+917787923930";
-    // sendTransacSms.content = "content of the SMS message goes here";
-
-       sendSms.sender = 'snapem'; // Replace with your sender name
-   sendSms.recipient = '+917787923930'; // Replace with recipient phone number
-   sendSms.content = 'Your message here';
+     
 
     try {
-      const response = await  apiInstance.sendTransacSms(sendSms);
+      const response = await brevoClient.sendTransacSms(sendTransacSms)
       console.log('SMS sent successfully:', response);
     } catch (error) {
       console.error('Error sending SMS:', error);

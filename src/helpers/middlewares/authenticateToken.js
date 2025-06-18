@@ -6,7 +6,7 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    console.log(token,authHeader, 'token===>');
+   
 
     if (!token) return authFailureResponse(res, 'Token not found');
   

@@ -63,7 +63,7 @@ module.exports = {
         };
 
         const location = await s3.send(new PutObjectCommand(uploadParams));
-         const screenshotId = new mongoose.Types.ObjectId();
+        const screenshotId = new mongoose.Types.ObjectId();
 
         // Push image metadata to array
         screenshotEntry.screenshots.push({
@@ -91,7 +91,7 @@ module.exports = {
         await user.save();
       }
       console.log(screenshotEntry, "screenshotEntry service=====>");
-      return screenshotEntry; 
+      return screenshotEntry;
     } catch (error) {
       console.error("Error saving screenshot:", error);
       return error.message;
@@ -109,7 +109,12 @@ module.exports = {
         if (endDate) query.date.$lte = new Date(endDate);
       }
 
+      // const pageNumber = parseInt(page, 10);
+      // const limitNumber = parseInt(limit, 10);
+      // const skip = (pageNumber - 1) * limitNumber;
+
       console.log(query, "query=====>");
+      // const totalCount = await Screenshot.countDocuments(query);
 
       // const screenshots = await Screenshot.find(query);
       const screenshots = await Screenshot.find(query).select("-screenshots");
@@ -133,19 +138,42 @@ module.exports = {
   },
   getAllScreenshotsById: async (req) => {
     const { id } = req.params;
+    const { page = 1, limit = 10 } = req.query;
     try {
+      const pageNumber = parseInt(page, 10);
+      const limitNumber = parseInt(limit, 10);
+      const skip = (pageNumber - 1) * limitNumber;
+
       const screenshot = await Screenshot.findById(id).select("-__v -user");
       if (!screenshot) {
         return "Screenshots not found";
       }
       console.log(screenshot, "screenshot=====>");
-      const formattedScreenshot = {
-        ...screenshot.toObject(),
-        date: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-        createdAt: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-        updatedAt: moment(screenshot.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
-      };
 
+       const totalCount = screenshot.screenshots.length;
+
+       const paginatedScreenshots = screenshot.screenshots
+      .slice(skip, skip + limitNumber)
+    
+
+        const formattedScreenshot = {
+      ...screenshot.toObject(),
+      screenshots: paginatedScreenshots, // replace full list with paginated list
+      date: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+      createdAt: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+      updatedAt: moment(screenshot.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+      totalCount,
+      currentPage: pageNumber,
+      totalPages: Math.ceil(totalCount / limitNumber),
+    };
+      
+      // const formattedScreenshot = {
+      //   ...screenshot.toObject(),
+      //   date: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+      //   createdAt: moment(screenshot.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+      //   updatedAt: moment(screenshot.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+      // };
+ 
       console.log(formattedScreenshot, "formattedScreenshot=====>");
       return formattedScreenshot;
     } catch (error) {
@@ -154,46 +182,53 @@ module.exports = {
     }
   },
   deleteScreenshots: async (req) => {
-     const {  id } = req.query;
+    const { id } = req.query;
     try {
       // const screenshot = await Screenshot.findByIdAndDelete(id);
       // if (!screenshot) {
       //   return "Screenshot not found";
       // }
-        const { screenshotEntryId, screenshotIds = [],deleteAll = false } = req.body;
-    const userId = id ? id : req.user.id;
+      const {
+        screenshotEntryId,
+        screenshotIds = [],
+        deleteAll = false,
+      } = req.body;
+      const userId = id ? id : req.user.id;
 
-    const screenshotEntry = await Screenshot.findOne({
-      _id: screenshotEntryId,
-      user: userId,
-    });
+      const screenshotEntry = await Screenshot.findOne({
+        _id: screenshotEntryId,
+        user: userId,
+      });
 
-    if (!screenshotEntry) return "Screenshot not found";
-       const screenshotsToDelete = deleteAll
-      ? screenshotEntry.screenshots
-      : screenshotEntry.screenshots.filter(s =>
-          screenshotIds.includes(s._id.toString())
-        );
+      if (!screenshotEntry) return "Screenshot not found";
+      const screenshotsToDelete = deleteAll
+        ? screenshotEntry.screenshots
+        : screenshotEntry.screenshots.filter((s) =>
+            screenshotIds.includes(s._id.toString())
+          );
 
       //  const remainingScreenshots = [];
-       for (const screenshot of screenshotsToDelete) {
-      if (screenshot.s3Key) {
-        const deleteParams = {
-          Bucket: process.env.AWS_BUCKET_NAME,
-          Key: screenshot.s3Key,
-        };
-        await s3.send(new DeleteObjectCommand(deleteParams));
+      for (const screenshot of screenshotsToDelete) {
+        if (screenshot.s3Key) {
+          const deleteParams = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: screenshot.s3Key,
+          };
+          await s3.send(new DeleteObjectCommand(deleteParams));
+        }
       }
-    }
 
-    // Filter out deleted screenshots
-    screenshotEntry.screenshots = screenshotEntry.screenshots.filter(
-      s => !screenshotsToDelete.some(d => d._id.toString() === s._id.toString())
-    );
-    await screenshotEntry.save();
+      // Filter out deleted screenshots
+      screenshotEntry.screenshots = screenshotEntry.screenshots.filter(
+        (s) =>
+          !screenshotsToDelete.some(
+            (d) => d._id.toString() === s._id.toString()
+          )
+      );
+      await screenshotEntry.save();
 
       // console.log(screenshot, "screenshot=====>");
-      return {screenshots :screenshotEntry.screenshots};
+      return { screenshots: screenshotEntry.screenshots };
     } catch (error) {
       console.error("Error deleting screenshot:", error);
       return error.message;

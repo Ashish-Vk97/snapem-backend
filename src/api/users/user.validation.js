@@ -13,7 +13,6 @@ module.exports = {
     gender: validations.gender,
     role: validations.role,
     // address:validate.object().keys({
-
     //     city: validations.string.allow("").optional(),
     //     state: validations.string.allow("").optional(),
     //     country: validations.string.allow("").optional(),
@@ -44,15 +43,12 @@ module.exports = {
   updateUserStatus: joi.object().keys({
     status: joi
       .string()
-      .valid("inactive", "active")
+      .valid("inactive", "active", "true", "false")
       .required()
       .messages({
-        "any.only": "Status must be either 'inactive' or 'active'",
+        "any.only": "Status must be either 'inactive', 'active', 'true', or 'false'",
         "any.required": "Status is required",
       }),
-       userId: validations.string.allow("").optional()
-
+    userId: validations.string.allow("").optional()
   }),
-
- 
 };

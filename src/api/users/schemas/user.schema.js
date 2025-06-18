@@ -71,6 +71,7 @@ const userSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Emergencycontact",
     },
+    isFreeAccess: { type: Boolean, default: false },
     isSubscribed: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isDelete: { type: Boolean, default: false },

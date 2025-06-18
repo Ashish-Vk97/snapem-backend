@@ -130,4 +130,35 @@ module.exports = {
       return response.internalFailureResponse(res, error);
     }
   },
+  userFreeAccess: async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const status = req.body.status;
+      console.log(`updateUserStatus: `, userId);
+
+      const failure = userValidation.updateUserStatus.validate({
+        userId: userId,
+        status: req.body.status,
+      });
+      console.log(failure, "failure");
+      if (failure.error) {
+        return response.failedValidationResponse(res, failure);
+      }
+
+      const result = await service.userFreeAccess(userId, status);
+
+      if (result && typeof result !== "string") {
+        return response.successResponse(
+          res,
+          result,
+          "Free access updated successfully"
+        );
+      }
+      return response.servicefailureResponse(res, result);
+    } catch (error) {
+      console.log(error);
+      //   logger.error(`Change password failed: ${error.message}`);
+      return response.internalFailureResponse(res, error);
+    }
+  },
 };
