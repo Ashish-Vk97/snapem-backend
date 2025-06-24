@@ -22,6 +22,24 @@ module.exports = {
       return response.internalFailureResponse(res, error.message);
     }
   },
+  getAllUsersCount: async (req, res) => {
+    try {
+      const result = await service.getAllUsersCount(req);
+
+      if (result && typeof result !== "string") {
+        return response.successResponse(
+          res,
+          result,
+          "Users count fetched successfully"
+        );
+      }
+      return response.servicefailureResponse(res, result);
+
+    } catch (error) {
+       return response.internalFailureResponse(res, error.message);
+
+    }
+  },
   getUserById: async (req, res) => {
     try {
       const result = await service.getUserById(req);

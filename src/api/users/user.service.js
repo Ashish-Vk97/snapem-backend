@@ -11,27 +11,82 @@ module.exports = {
       res.status(400).json({ message: error.message });
     }
   },
+  // getAllUsers: async (req) => {
+  //   const page = parseInt(req.query.page) || 1;
+
+  //   const limit = parseInt(req.query.limit) || 10;
+  //   try {
+  //     const startIndex = (page - 1) * limit;
+  //   //   const endIndex = page * limit;
+
+  //     const users = await User.find()
+  //       .limit(limit)
+  //       .skip(startIndex)
+  //       .sort({ createdAt: -1 });
+
+  //     if (users.length > 0) {
+  //       return users;
+  //     }
+  //     return "users not found";
+  //   } catch (error) {
+  //     return error.message;
+  //   }
+  // },
   getAllUsers: async (req) => {
-    const page = parseInt(req.query.page) || 1;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || "";
+  // let searchQuery = {};
 
-    const limit = parseInt(req.query.limit) || 10;
-    try {
-      const startIndex = (page - 1) * limit;
-    //   const endIndex = page * limit;
+  try {
+    
+  const searchQuery = search
+    ? {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
+    const startIndex = (page - 1) * limit;
 
-      const users = await User.find()
+    const [users, totalCount] = await Promise.all([
+      User.find(searchQuery)
+        .select("-password -__v")
         .limit(limit)
         .skip(startIndex)
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 }),
+      User.countDocuments()
+    ]);
 
-      if (users.length > 0) {
-        return users;
-      }
-      return "users not found";
-    } catch (error) {
-      return error.message;
-    }
-  },
+    return {
+      users,
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit)
+    };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return  error.message ;
+  }
+},
+getAllUsersCount: async () => {
+  try {
+    const [totalUsers, subscribedUsers] = await Promise.all([
+      User.countDocuments({ isDelete: false }),
+      User.countDocuments({ isDelete: false, isSubscribed: true }),
+    ]);
+
+    return {
+      totalUsers,
+      subscribedUsers,
+    };
+  } catch (error) {
+    console.error("Error counting users:", error);
+    return  error.message ;
+  }
+},
+
   getUserById: async (req) => {         
     const {id} = req.params;
         
