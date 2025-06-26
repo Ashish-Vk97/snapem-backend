@@ -50,6 +50,8 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
 }));
+app.options('*', cors()); // enable preflight across-the-board
+
 
 
 
