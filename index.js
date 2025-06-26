@@ -45,7 +45,11 @@ app.use(
 // app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(cors()); 
+const allowedOrigins = [process.env.WEB_URL];
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 
 
 
