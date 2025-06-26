@@ -77,23 +77,98 @@ module.exports ={
       return error.message;
     }
   },
+  // updateSubscriptionPlanById: async (req) => {
+  //   const { id } = req.params;
+  //   const data = req.body;
+  //   try {
+  //     const updatedPlan = await SubscriptionPlan.findByIdAndUpdate(
+  //       id,
+  //       { $set: { ...data } },
+  //       { new: true }
+  //     );
+  //     if (!updatedPlan) {
+  //       return "Subscription Plan not found";
+  //     }
+  //     return updatedPlan;
+  //   } catch (error) {
+  //     return error.message;
+  //   }
+  // },
   updateSubscriptionPlanById: async (req) => {
-    const { id } = req.params;
-    const data = req.body;
-    try {
-      const updatedPlan = await SubscriptionPlan.findByIdAndUpdate(
-        id,
-        { $set: { ...data } },
-        { new: true }
-      );
-      if (!updatedPlan) {
-        return "Subscription Plan not found";
-      }
-      return updatedPlan;
-    } catch (error) {
-      return error.message;
+  const { id } = req.params;
+  const data = req.body;
+
+  try {
+    // 1. Fetch existing plan from DB
+    const existingPlan = await SubscriptionPlan.findById(id);
+    if (!existingPlan) {
+      return "Subscription Plan not found";
     }
-  },
+
+    // 2. Update Stripe Product (name/description)
+    await stripe.products.update(existingPlan.stripeProductId, {
+      name: data?.cardType,
+      description: data?.description || '',
+    });
+
+    // 3. Deactivate old Stripe Price
+    if (existingPlan.stripePriceId) {
+      await stripe.prices.update(existingPlan.stripePriceId, {
+        active: false,
+      });
+    }
+
+    // 4. Create a new Stripe Price
+    const priceInCents = Math.round(data?.price * 100);
+    let interval, interval_count;
+
+    switch (data?.duration) {
+      case 1:
+        interval = 'month';
+        interval_count = 1;
+        break;
+      case 2:
+        interval = 'month';
+        interval_count = 6;
+        break;
+      case 3:
+        interval = 'year';
+        interval_count = 1;
+        break;
+      default:
+        throw new Error("Invalid duration value");
+    }
+
+    const newStripePrice = await stripe.prices.create({
+      unit_amount: priceInCents,
+      currency: data?.currency?.toLowerCase() || 'usd',
+      recurring: {
+        interval,
+        interval_count,
+      },
+      product: existingPlan.stripeProductId,
+    });
+  console.log(newStripePrice)
+    // 5. Update MongoDB document with new Stripe Price ID
+    const updatedPlan = await SubscriptionPlan.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          ...data,
+          stripePriceId: newStripePrice.id,
+        },
+      },
+      { new: true }
+    );
+
+    return updatedPlan;
+
+  } catch (error) {
+    console.error("Error updating subscription plan:", error);
+    return error.message;
+  }
+},
+
   getSubscriptionById: async (req) => {
     const { id } = req.params;
     try {

@@ -1,5 +1,6 @@
 const { signIn, forgotPassword } = require("./auth.validation");
 const User = require("../users/schemas/user.schema");
+const MobileDetect = require("mobile-detect");
 const {
   comparePassword,
   generateToken,
@@ -8,11 +9,11 @@ const {
 const { role } = require("../../helpers/global/validation.constants");
 const mailer = require("../../helpers/utils/mail.utils");
 module.exports = {
-  signIn: async (data,req) => {
+  signIn: async (data, req) => {
     const { email, password } = data;
     try {
       const user = await User.findOne({ email });
-      
+
       if (!user) {
         return "Email or password is incorrect. Please try again.";
       }
@@ -22,13 +23,19 @@ module.exports = {
       // Check if request is from a mobile device
       // Assume 'data.req' contains the Express request object
       let isMobile = false;
-      if (req && req.headers && req.headers['user-agent']) {
-        const userAgent = req.headers['user-agent'];
-        console.log(userAgent, "userAgent in auth service");
-        // Simple mobile detection (can be improved with a library)
-        isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
-      }
 
+      // if (req && req.headers && req.headers["user-agent"]) {
+      //   const md = new MobileDetect(req.headers["user-agent"]);
+      //   isMobile = !!md.phone(); // true only for real phones, not tablets or desktops
+      // }
+          if (req && req.headers && req.headers['user-agent']) {
+            const userAgent = req.headers['user-agent'];
+            console.log(userAgent, "userAgent in auth service");
+            
+           isMobile = /android/i.test(userAgent) && /mobile/i.test(userAgent);
+
+          }
+      console.log(isMobile, "mob=======>");
       if (user.role === "USER" && !user.isSubscribed && isMobile) {
         return "You have no subscription. Please purchase your plan.";
       }
@@ -137,9 +144,7 @@ module.exports = {
 
         return {
           message: `Password reset link has been sent to your mail!`,
-          link: `${
-            process.env.WEB_URL
-          }/changePassword/${await generateToken({
+          link: `${process.env.WEB_URL}/changePassword/${await generateToken({
             id: users[0]._id.toString(),
             email: users[0].email,
             role: users[0].role,

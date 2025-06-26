@@ -98,7 +98,9 @@ module.exports = {
       const userId = req.user.id;
       const query = { user: id ? id : userId };
 
-      const videos = await Video.find(query).select("-videos");
+      const videos = await Video.find(query)
+        .select("-videos")
+        .sort({ createdAt: -1 });
       if (!videos || videos.length === 0) {
         return "No videos found for this user.";
       }
@@ -131,7 +133,7 @@ module.exports = {
       }
       const totalCount = video.videos.length;
 
-      const paginatedVideos = video.videos.slice(skip, skip + limitNumber);
+      const paginatedVideos = video.videos.reverse().slice(skip, skip + limitNumber);
 
       const formattedVideo = {
         ...video.toObject(),

@@ -117,7 +117,9 @@ module.exports = {
       // const totalCount = await Screenshot.countDocuments(query);
 
       // const screenshots = await Screenshot.find(query);
-      const screenshots = await Screenshot.find(query).select("-screenshots");
+      const screenshots = await Screenshot.find(query)
+        .select("-screenshots")
+        .sort({ createdAt: -1 });
       if (!screenshots || screenshots.length === 0) {
         return "No screenshots found for this user.";
       }
@@ -152,7 +154,7 @@ module.exports = {
 
        const totalCount = screenshot.screenshots.length;
 
-       const paginatedScreenshots = screenshot.screenshots
+       const paginatedScreenshots = screenshot.screenshots.reverse()
       .slice(skip, skip + limitNumber)
     
 
