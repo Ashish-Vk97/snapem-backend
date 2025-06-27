@@ -21,6 +21,19 @@ const port = process.env.PORT || 3000;
 
 
   
+const allowedOrigins = [process.env.WEB_URL || "https://snapem.org"];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
+  },
+  credentials: true,
+}));
+
+app.options("*", cors());// enable preflight across-the-board
  cron.schedule("0 0 * * *", async () => {
     // Run the cleanup job every 10 minutes
     // cron.schedule("*/5 * * * *", async () => {
@@ -45,14 +58,6 @@ app.use(
 // app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-const allowedOrigins = [process.env.WEB_URL];
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-}));
-app.options('*', cors()); // enable preflight across-the-board
-
-
 
 
 mongoose.connect(process.env.MONGODB_URI)
