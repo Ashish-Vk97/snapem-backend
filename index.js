@@ -34,6 +34,7 @@ app.use(cors({
 }));
 
 app.options("*", cors());// enable preflight across-the-board
+
  cron.schedule("0 0 * * *", async () => {
     // Run the cleanup job every 10 minutes
     // cron.schedule("*/5 * * * *", async () => {
