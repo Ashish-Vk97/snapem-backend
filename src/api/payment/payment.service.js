@@ -239,8 +239,8 @@ module.exports = {
   };
 
   // Update flags
-  //  user.isSubscribed =  subscription.canceled_at?.toString() && subscription.cancel_at_period_end === true ? false : true;
-    user.isSubscribed = subscription.status === "active";
+   user.isSubscribed =  subscription.canceled_at?.toString() && subscription.cancel_at_period_end === true ? false : true;
+    // user.isSubscribed = subscription.status === "active";
 
   user.status = subscription.status;
   
