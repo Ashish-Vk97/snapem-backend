@@ -198,7 +198,7 @@ module.exports = {
       // Event when subscription is updated
       case "customer.subscription.updated":
         console.log("Subscription updated!");
-        // console.log(event.data.object);
+        console.log(event.data.object);
 
          const subscription = event.data.object;
   const stripeCustomerId = subscription.customer;
