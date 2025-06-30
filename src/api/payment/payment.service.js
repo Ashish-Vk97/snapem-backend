@@ -111,7 +111,7 @@ module.exports = {
             currency: subscriptionDetails?.currency || "",
             interval: priceItem?.recurring.interval || "",
             interval_count: priceItem?.recurring?.interval_count || 0,
-            amount: priceItem?.unit_amount / 100 || 0, // Stripe stores in cents
+            amount: priceItem?.unit_amount  || 0, // Stripe stores in cents
           },
         };
 
@@ -239,7 +239,9 @@ module.exports = {
   };
 
   // Update flags
-   user.isSubscribed =  subscription.canceled_at?.toString() && subscription.cancel_at_period_end === true ? false : true;
+  //  user.isSubscribed =  subscription.canceled_at?.toString() && subscription.cancel_at_period_end === true ? false : true;
+    user.isSubscribed = subscription.status === "active";
+
   user.status = subscription.status;
   
 

@@ -36,9 +36,9 @@ module.exports = {
 
           }
       console.log(isMobile, "mob=======>");
-      if (user.role === "USER" && !user.isSubscribed && isMobile) {
-        return "You have no subscription. Please purchase your plan.";
-      }
+      // if (user.role === "USER" && !user.isSubscribed && isMobile) {
+      //   return "You have no subscription. Please purchase your plan.";
+      // }
 
       // if(user.isDelete) {
       //     return  'User is deleted';
