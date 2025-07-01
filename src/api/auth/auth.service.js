@@ -9,88 +9,88 @@ const {
 const { role } = require("../../helpers/global/validation.constants");
 const mailer = require("../../helpers/utils/mail.utils");
 module.exports = {
-  signIn: async (data, req) => {
-    const { email, password } = data;
-    try {
-      const user = await User.findOne({ email });
+  // signIn: async (data, req) => {
+  //   const { email, password } = data;
+  //   try {
+  //     const user = await User.findOne({ email });
 
-      if (!user) {
-        return "Email or password is incorrect. Please try again.";
-      }
-      if (!user.isActive) {
-        return "You are currently inactive. Please contact your Admin.";
-      }
-      // Check if request is from a mobile device
-      // Assume 'data.req' contains the Express request object
-      let isMobile = false;
+  //     if (!user) {
+  //       return "Email or password is incorrect. Please try again.";
+  //     }
+  //     if (!user.isActive) {
+  //       return "You are currently inactive. Please contact your Admin.";
+  //     }
+  //     // Check if request is from a mobile device
+  //     // Assume 'data.req' contains the Express request object
+  //     let isMobile = false;
 
-      // if (req && req.headers && req.headers["user-agent"]) {
-      //   const md = new MobileDetect(req.headers["user-agent"]);
-      //   isMobile = !!md.phone(); // true only for real phones, not tablets or desktops
-      // }
-          if (req && req.headers && req.headers['user-agent']) {
-            const userAgent = req.headers['user-agent'];
-            console.log(userAgent, "userAgent in auth service");
+  //     // if (req && req.headers && req.headers["user-agent"]) {
+  //     //   const md = new MobileDetect(req.headers["user-agent"]);
+  //     //   isMobile = !!md.phone(); // true only for real phones, not tablets or desktops
+  //     // }
+  //         if (req && req.headers && req.headers['user-agent']) {
+  //           const userAgent = req.headers['user-agent'];
+  //           console.log(userAgent, "userAgent in auth service");
             
-           isMobile = /android/i.test(userAgent) && /mobile/i.test(userAgent);
+  //          isMobile = /android/i.test(userAgent) && /mobile/i.test(userAgent);
 
-          }
-      console.log(isMobile, "mob=======>");
-      // if (user.role === "USER" && !user.isSubscribed && isMobile) {
-      //   return "You have no subscription. Please purchase your plan.";
-      // }
+  //         }
+  //     console.log(isMobile, "mob=======>");
+  //     // if (user.role === "USER" && !user.isSubscribed && isMobile) {
+  //     //   return "You have no subscription. Please purchase your plan.";
+  //     // }
 
-      // if(user.isDelete) {
-      //     return  'User is deleted';
-      // }
+  //     // if(user.isDelete) {
+  //     //     return  'User is deleted';
+  //     // }
 
-      const verified = await comparePassword(password, user.password);
+  //     const verified = await comparePassword(password, user.password);
 
-      if (!verified) {
-        return "Email or password is incorrect! Please try again";
-      }
-      return {
-        token: await generateToken({
-          id: user._id,
-          email: user.email,
-          role: user.role,
-        }),
-        _id: user._id,
-        name: user.name,
-        role: user.role,
-        email: user.email,
-      };
-    } catch (error) {
-      return `internal server error===>${error.message}`;
-    }
-  },
-  signUp: async (data) => {
-    try {
-      const { name, email } = data;
+  //     if (!verified) {
+  //       return "Email or password is incorrect! Please try again";
+  //     }
+  //     return {
+  //       token: await generateToken({
+  //         id: user._id,
+  //         email: user.email,
+  //         role: user.role,
+  //       }),
+  //       _id: user._id,
+  //       name: user.name,
+  //       role: user.role,
+  //       email: user.email,
+  //     };
+  //   } catch (error) {
+  //     return `internal server error===>${error.message}`;
+  //   }
+  // },
+  // signUp: async (data) => {
+  //   try {
+  //     const { name, email } = data;
 
-      const user = await User.findOne({ email });
+  //     const user = await User.findOne({ email });
 
-      if (user) {
-        return `User already exists`;
-      }
+  //     if (user) {
+  //       return `User already exists`;
+  //     }
 
-      data.password = await hashPassword(data.password);
+  //     data.password = await hashPassword(data.password);
 
-      const newUser = new User(data);
-      const userDetails = await newUser.save();
+  //     const newUser = new User(data);
+  //     const userDetails = await newUser.save();
 
-      const userDetailsObj = userDetails.toObject();
+  //     const userDetailsObj = userDetails.toObject();
 
-      return {
-        name: userDetailsObj.name,
-        role: userDetailsObj.role,
-        email: userDetailsObj.email,
-      };
-    } catch (error) {
-      console.log(error);
-      return "internal server error ===> " + error.message;
-    }
-  },
+  //     return {
+  //       name: userDetailsObj.name,
+  //       role: userDetailsObj.role,
+  //       email: userDetailsObj.email,
+  //     };
+  //   } catch (error) {
+  //     console.log(error);
+  //     return "internal server error ===> " + error.message;
+  //   }
+  // },
 
   // forgotPassword: async (data) => {
   //   const { email,password } = data;
@@ -116,6 +116,85 @@ module.exports = {
   //     return `internal server error ===> ${error.message}`;
   //   }
   // },
+
+
+  signIn: async (data, req) => {
+  const email = data.email.toLowerCase(); // Convert to lowercase
+  const { password } = data;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return "Email or password is incorrect. Please try again.";
+    }
+
+    if (!user.isActive) {
+      return "You are currently inactive. Please contact your Admin.";
+    }
+
+    let isMobile = false;
+    if (req && req.headers && req.headers["user-agent"]) {
+      const userAgent = req.headers["user-agent"];
+      console.log(userAgent, "userAgent in auth service");
+      isMobile = /android/i.test(userAgent) && /mobile/i.test(userAgent);
+    }
+
+    console.log(isMobile, "mob=======>");
+
+    const verified = await comparePassword(password, user.password);
+
+    if (!verified) {
+      return "Email or password is incorrect! Please try again";
+    }
+
+    return {
+      token: await generateToken({
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      }),
+      _id: user._id,
+      name: user.name,
+      role: user.role,
+      email: user.email,
+    };
+  } catch (error) {
+    return `internal server error===>${error.message}`;
+  }
+},
+
+  signUp: async (data) => {
+  try {
+    // Ensure email is lowercase before checking and saving
+    const email = data.email.toLowerCase();
+    const { name } = data;
+
+    // Check if user already exists
+    const user = await User.findOne({ email });
+    if (user) {
+      return `User already exists`;
+    }
+
+    // Hash the password
+    data.password = await hashPassword(data.password);
+
+    // Set email in lowercase
+    const newUser = new User({ ...data, email });
+    const userDetails = await newUser.save();
+
+    const userDetailsObj = userDetails.toObject();
+
+    return {
+      name: userDetailsObj.name,
+      role: userDetailsObj.role,
+      email: userDetailsObj.email,
+    };
+  } catch (error) {
+    console.log(error);
+    return "internal server error ===> " + error.message;
+  }
+},
 
   forgotPassword: async (email) => {
     try {
